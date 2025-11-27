@@ -101,16 +101,19 @@ scripts/
 - Upload or Google Drive options
 
 ### Sample Results (Preliminary - Test Run)
-- ✅ **Grid search over parameters:** α ∈ {0.25, 0.5, 0.75} × η ∈ {0.0, 1.0} = 6 Hybrid configurations
 - ✅ **8 policy configurations tested per branch:**
-  1. **Urgency** (α=1.0, η=0.0) - Pure urgency, no fairness
-  2. **Utility** (α=0.0, η=0.0) - Pure utility, no fairness
-  3. **Hybrid** (α=0.25, η=0.0) - 25% urgency + 75% utility, no fairness
-  4. **Hybrid** (α=0.5, η=0.0) - 50% urgency + 50% utility, no fairness
-  5. **Hybrid** (α=0.75, η=0.0) - 75% urgency + 25% utility, no fairness
-  6. **Hybrid+Fair** (α=0.25, η=1.0) - 25% urgency + 75% utility, with fairness
-  7. **Hybrid+Fair** (α=0.5, η=1.0) - 50% urgency + 50% utility, with fairness
-  8. **Hybrid+Fair** (α=0.75, η=1.0) - 75% urgency + 25% utility, with fairness
+  - **2 Baseline policies** (not part of grid):
+    1. **Urgency** (α=1.0, η=0.0) - Pure urgency, no fairness
+    2. **Utility** (α=0.0, η=0.0) - Pure utility, no fairness
+  - **6 Hybrid configurations from grid search** (α × η combinations):
+    3. **Hybrid** (α=0.25, η=0.0) - 25% urgency + 75% utility, no fairness
+    4. **Hybrid** (α=0.5, η=0.0) - 50% urgency + 50% utility, no fairness
+    5. **Hybrid** (α=0.75, η=0.0) - 75% urgency + 25% utility, no fairness
+    6. **Hybrid+Fair** (α=0.25, η=1.0) - 25% urgency + 75% utility, with fairness
+    7. **Hybrid+Fair** (α=0.5, η=1.0) - 50% urgency + 50% utility, with fairness
+    8. **Hybrid+Fair** (α=0.75, η=1.0) - 75% urgency + 25% utility, with fairness
+  
+  **Grid search:** Tests all combinations of α ∈ {0.25, 0.5, 0.75} × η ∈ {0.0, 1.0} for Hybrid policies only
 - ✅ **All 3 branches tested** (main, composite-fairness, multidim-fairness)
 - ✅ **3 figure types generated** per branch (urgency vs benefit, fairness vs benefit, summary bars)
 - ✅ Pipeline verified and working across all branches
@@ -169,7 +172,9 @@ python scripts/add_ses.py \
 
 ### Running Parameter Sweeps (Grid Search)
 
-**Performs grid search** over α (urgency/utility weight) and η (fairness strength) parameters.
+**How it works:**
+1. Always tests 2 baseline policies: **Urgency** (α=1.0) and **Utility** (α=0.0)
+2. Then performs **grid search** over α and η for **Hybrid policies only**
 
 **Basic sweep (default grid):**
 ```bash
@@ -178,9 +183,10 @@ python scripts/run_sweep.py \
   --donors data/donors.csv \
   --group_col Ethnicity
 ```
-**Default grid:** α ∈ {0.25, 0.5, 0.75} × η ∈ {0.0, 1.0} = 6 Hybrid configurations + 2 baselines = 8 total
+**Default grid for Hybrid:** α ∈ {0.25, 0.5, 0.75} × η ∈ {0.0, 1.0} = **6 Hybrid configurations**  
+**Plus 2 baselines** = **8 total configurations**
 
-**Custom grid search:**
+**Custom grid search (finer grid):**
 ```bash
 python scripts/run_sweep.py \
   --patients data/patients_with_ses.csv \
@@ -192,7 +198,10 @@ python scripts/run_sweep.py \
   --group_col SES \
   --seed 42
 ```
-**This grid:** 11 α values × 5 η values = 55 Hybrid configurations + 2 baselines = 57 total
+**This grid for Hybrid:** 11 α values × 5 η values = **55 Hybrid configurations**  
+**Plus 2 baselines** = **57 total configurations**
+
+**Note:** The grid search only applies to Hybrid policies. Urgency and Utility are always tested separately as baselines.
 
 ### Generating Plots
 
