@@ -1,5 +1,10 @@
 # Repository Branches - Detailed Comparison
 
+📋 **See [`README.md`](README.md) for quick start guide and overview**  
+📋 **See [`POLICY_FAIRNESS_INTERACTION.md`](POLICY_FAIRNESS_INTERACTION.md) for how allocation policies interact with fairness approaches**
+
+---
+
 **All branches tested with 5,000 patients, 1,000 donors (sampled from full 150k/20k dataset)**
 
 ⚠️ **CRITICAL:** These are proof-of-concept results. **Final experiments must use 20k-150k patients, 3k-20k donors for the paper.**

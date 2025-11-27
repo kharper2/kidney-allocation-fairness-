@@ -106,169 +106,21 @@ scripts/
 
 ## 🌳 Repository Branches - Three Fairness Approaches
 
-This repository has **3 branches** testing different fairness approaches. All tested with **5,000 patients, 1,000 donors** (sampled from full dataset).
+This repository has **3 branches** testing different fairness approaches. All tested with **5,000 patients, 1,000 donors** (proof-of-concept).
 
-⚠️ **IMPORTANT:** These are proof-of-concept results. **Final experiments must use 20k-150k patients, 3k-20k donors.**
+⚠️ **IMPORTANT:** All branches are **IMPLEMENTED & TESTED** but **NEED FULL DATASET RUNS (20k-150k patients, 3k-20k donors) for final paper.**
 
----
+### Quick Summary
 
-## 🔄 How Policies and Fairness Interact
+| Branch | Approach | Status | Best Result |
+|--------|----------|--------|-------------|
+| **`main`** | Single-dimension (Ethnicity OR SES) | ✅ Tested | 8,960 years, L1=0.0008 |
+| **`composite-fairness`** | Intersectional groups (15 groups) | ✅ Tested | 7,708 years, L1=0.002 |
+| **`multidim-fairness`** ⭐ | Weighted multi-dimensional | ✅ Tested | **9,535 years, L1=0.0008** |
 
-**Two-layer system:**
+**📋 See [`BRANCHES.md`](BRANCHES.md) for detailed descriptions, usage instructions, and full results**
 
-1. **Base Allocation Policy** (determines medical ranking):
-   - **Urgency-only:** Rank by sickness (sickest first)
-   - **Utility-only:** Rank by survival benefit (highest first)
-   - **Hybrid:** Rank by α × Urgency + (1-α) × Utility
-   - **Hybrid+Fair:** Hybrid + fairness constraint applied
-
-2. **Fairness Approach** (determines demographic balancing):
-   - **Single-dimension:** Balance one dimension (Ethnicity OR SES)
-   - **Composite:** Balance 15 intersectional groups (Black_Low, White_Middle, etc.)
-   - **Multi-dimensional:** Balance multiple dimensions with weights (70% Ethnicity + 30% SES)
-
-**How they combine:**
-- Base policy creates initial ranking (medical priorities)
-- Fairness constraint reorders queue to balance demographics
-- **Example:** Hybrid policy ranks by urgency+utility, then fairness picks best match from underrepresented groups
-
-**What we test:** Hybrid+Fair (α=0.5, η=1.0) with each fairness approach
-
-📋 **See `POLICY_FAIRNESS_INTERACTION.md` for detailed explanation**
-
----
-
-### 📌 `main` - Single-Dimension Fairness (Baseline)
-**Status:** ✅ **IMPLEMENTED & TESTED** - ⚠️ **NEEDS FULL DATASET RUN FOR SUBMISSION**
-
-**What it does:**
-- Balances fairness across ONE dimension at a time (Ethnicity OR SES)
-- Run separate experiments for each dimension, compare results
-- Standard approach in most allocation research
-- **Safest baseline** - most straightforward implementation
-
-**Test Results (Proof-of-concept: 5k patients, 1k donors, Ethnicity fairness):**
-- Hybrid+Fair (α=0.5, η=1.0): **8,960 years** benefit, L1=0.0008, **960/1,000** allocated
-- ⚠️ **These are preliminary results - must run with 20k-150k patients, 3k-20k donors for final paper**
-
-**Why this result makes sense:**
-- ✅ **Excellent fairness:** L1=0.0008 means each ethnic group within 0.08% of proportional share
-- ✅ **High efficiency:** 96% organs allocated
-- ⚠️ **Limitation:** Only considers ONE dimension (can't balance ethnicity AND SES simultaneously)
-
-**For Submission:**
-- Code is complete and tested
-- Pipeline verified with small samples
-- **MUST run final experiments with full dataset before submitting paper**
-
----
-
-### 📌 `composite-fairness` - Intersectional Groups
-**Status:** ✅ **IMPLEMENTED & TESTED** - ⚠️ **NEEDS FULL DATASET RUN FOR SUBMISSION**
-
-**What it does:**
-- Creates **intersectional groups** by combining attributes
-- Example: "Black_Low", "White_Middle", "Asian_High" (Ethnicity × SES = 15 groups)
-- Treats each combination as distinct demographic group
-- Balances across ALL 15 groups simultaneously
-
-**Test Results (Proof-of-concept: 5k patients, 1k donors, 15 composite groups):**
-- Hybrid+Fair (α=0.5, η=1.0): **7,708 years** benefit, L1=0.002, **897/1,000** allocated (⚠️ 10% wasted!)
-- 15 composite groups created: Largest = Black_Middle (26,227 patients), Smallest = Other_High (527 patients)
-- ⚠️ **These are preliminary results - must run with 20k-150k patients, 3k-20k donors for final paper**
-
-**Why this result makes sense:**
-- ✅ **Good intersectional fairness:** L1=0.002 means intersectional groups balanced
-- ⚠️ **Sparse group problem:** Some groups < 1% of population → hard to find compatible matches
-- ⚠️ **Efficiency cost:** When fairness requires tiny group with no Blood Type match → organ wasted
-- **Example:** Donor is Type AB, needs "Other_Low" patient (662 total), no Type AB in that group → kidney unused
-- **14% worse than single-dimension** due to sparsity constraints
-
-**For Submission:**
-- Code is complete and tested
-- Pipeline verified with small samples
-- **MUST run final experiments with full dataset before submitting paper**
-
----
-
-### 📌 `multidim-fairness` - Weighted Multi-Dimensional ⭐ **RECOMMENDED**
-**Status:** ✅ **IMPLEMENTED & TESTED** - ⚠️ **NEEDS FULL DATASET RUN FOR SUBMISSION**
-
-**What it does:**
-- Tracks **multiple dimensions independently** (Ethnicity AND SES)
-- Combines deficits with **configurable weights** (e.g., 70% ethnicity, 30% SES)
-- Prioritizes patients underrepresented on EITHER dimension
-- Scales easily to 4+ dimensions
-
-**How it works:**
-```
-Patient: Black, Low-SES
-- Ethnicity deficit: -15% (Black underrepresented)
-- SES deficit: -10% (Low underrepresented)  
-- Combined score: 0.7×(-15%) + 0.3×(-10%) = -13.5% (HIGH PRIORITY)
-
-vs
-
-Patient: White, High-SES
-- Ethnicity deficit: +12% (White overrepresented)
-- SES deficit: +8% (High overrepresented)
-- Combined score: 0.7×(+12%) + 0.3×(+8%) = +10.8% (low priority)
-```
-
-**Test Results (Proof-of-concept: 5k patients, 1k donors, 70% Ethnicity + 30% SES):**
-- Hybrid+Fair (α=0.5, η=1.0): **9,535 years** benefit, L1=0.0008, **1,000/1,000** allocated (✅ 100%!)
-- ⚠️ **These are preliminary results - must run with 20k-150k patients, 3k-20k donors for final paper**
-
-**Why this result makes sense:**
-- ✅ **Best efficiency:** ALL organs allocated (no waste!)
-- ✅ **Excellent fairness:** L1=0.0008 across BOTH dimensions
-- ✅ **+24% better than composite** (9,535 vs 7,708 years)
-- ✅ **+6% better than single-dimension** while balancing BOTH dimensions!
-- **Why it works:** Tracks 8 groups (5 ethnicities + 3 SES), not 15 intersections → always has compatible matches
-- **Flexibility:** Can prioritize "Black OR Low-SES" patients → more options → better matches
-
-**For Submission:**
-- Code is complete and tested
-- Pipeline verified with small samples
-- **MUST run final experiments with full dataset before submitting paper**
-- **Recommended approach** for final paper (best results)
-
----
-
-## 📊 Direct Comparison (All: Hybrid+Fair, α=0.5, η=1.0)
-
-| Approach | Benefit | Fairness L1 | Organs Used | vs Composite |
-|----------|---------|-------------|-------------|--------------|
-| **Single-Dimension** | 8,960 years | 0.0008 | 960/1,000 | +16% |
-| **Composite** | 7,708 years | 0.002 | 897/1,000 | baseline |
-| **Multi-Dimensional** ⭐ | **9,535 years** | **0.0008** | **1,000/1,000** | **+24%** |
-
-**Winner:** Multi-dimensional dominates on ALL metrics!
-
----
-
-## 💡 Why These Results Make Sense
-
-### Why Multidim > Composite:
-**Sparse Group Problem:**
-- Composite creates 15 intersectional groups, some < 1% of population
-- Blood Type constraint × 15 groups = 120 possible combinations (many with zero patients!)
-- When fairness activates for tiny group with no compatible match → organ wasted
-
-**Multidim Solution:**
-- Tracks 8 groups (not 15) with flexible combination
-- Always has large pools in each dimension → always finds matches
-- **Analogy:** "I need gluten-free vegan restaurant" (hard) vs "I prefer 70% dietary-friendly, 30% close" (flexible!)
-
-### Why Fairness Costs Only ~6%:
-- Fairness constraint doesn't change WHO gets kidneys dramatically, just WHEN
-- High-benefit patient from over-represented group skipped once → likely gets next kidney
-- Algorithm picks "best match from underserved groups" (still good matches!)
-
-### Why All Three Achieve L1 < 0.002:
-- Fairness constraints work as designed
-- L1=0.0008 means each group within 0.08% of proportional representation
-- Nearly perfect fairness achieved
+**📋 See [`POLICY_FAIRNESS_INTERACTION.md`](POLICY_FAIRNESS_INTERACTION.md) for how allocation policies interact with fairness approaches**
 
 ---
 
@@ -398,50 +250,17 @@ open main.pdf  # or xdg-open on Linux
 
 ### Sample Results (Preliminary - Proof of Concept)
 
-**⚠️ IMPORTANT:** These are from a proof-of-concept run using **our actual data files** (`patients.csv` and `donors.csv`) but sampled to **5,000 patients and 1,000 donors** to quickly verify the pipeline works end-to-end. 
+**⚠️ IMPORTANT:** All results are from proof-of-concept runs with **5,000 patients, 1,000 donors** (sampled from full dataset). 
 
-**🚨 Final experiments MUST be run with larger samples (20k-150k patients, 3k-20k donors) for the paper!**
+**🚨 Final experiments MUST be run with 20k-150k patients, 3k-20k donors for the paper!**
 
----
-
-**Main Branch Results (5,000 patients, 1,000 donors, Ethnicity fairness):**
-
-| Policy | Total Benefit | Mean Urgency | Fairness L1 | Organs Allocated |
-|--------|--------------|--------------|-------------|------------------|
-| **Utility** | 10,391 years | 0.558 | 0.033 | 1,000/1,000 |
-| **Hybrid (α=0.25)** | 10,282 years | 0.635 | 0.034 | 1,000/1,000 |
-| **Hybrid (α=0.50)** | 9,794 years | 0.707 | 0.019 | 1,000/1,000 |
-| **Hybrid+Fair (α=0.25, η=1.0)** | 9,434 years | 0.611 | **0.0008** | 960/1,000 |
-| **Hybrid+Fair (α=0.50, η=1.0)** | 8,960 years | 0.686 | **0.0008** | 960/1,000 |
-| **Urgency** | 8,038 years | **0.767** | 0.010 | 1,000/1,000 |
-
-**Preliminary Findings (will be updated with full data):**
+**Key Findings:**
 - 🎯 **+29% benefit gain**: Utility vs Urgency (10,391 vs 8,038 years)
 - 🎯 **96% disparity reduction**: With fairness constraints (L1: 0.021 → 0.0008)
-- 🎯 **Only ~8% benefit cost**: For fairness at α=0.25 (10,282 → 9,434 years)
-- 🎯 **α = 0.25**: Appears optimal - balances benefit and urgency
+- 🎯 **Only ~8% benefit cost**: For fairness enforcement
+- 🎯 **Multi-dimensional approach best**: 9,535 years (vs 8,960 single-dim, 7,708 composite)
 
-**Why These Results Make Sense:**
-
-✅ **Utility > Urgency by 29%**
-- Utility policy matches good kidneys (low KDPI) with healthy recipients (low EPTS) who gain most years
-- Urgency policy gives kidneys to sickest patients who often have shorter prognosis even with transplant
-- Example: Healthy 35-year-old might gain 15+ years vs very sick 70-year-old gains 2-3 years
-
-✅ **High Urgency Scores with Urgency Policy (0.767 vs 0.558)**
-- Urgency policy explicitly sorts by sickness → prioritizes sickest patients
-- Utility policy sorts by benefit → often picks healthier patients with more years to gain
-- This is the fundamental trade-off we're measuring
-
-✅ **Low Fairness Cost (~8%)**
-- Fairness constraint doesn't destroy all medical benefit, just reorders the queue
-- High-benefit patient from over-represented group skipped once → likely gets next kidney
-- Algorithm still picks good matches, just from underserved groups
-
-✅ **Near-Perfect Fairness (L1=0.0008)**
-- L1=0.0008 means each ethnic group gets within **0.08%** of proportional share
-- If Black patients are 30% of waitlist, they get 29.92-30.08% of kidneys
-- Fairness algorithm works exactly as designed
+**📋 See [`BRANCHES.md`](BRANCHES.md) for complete results tables, detailed explanations, and comparison across all three fairness approaches**
 
 ### Understanding the Figures
 

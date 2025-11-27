@@ -1,5 +1,10 @@
 # How Allocation Policies Interact with Fairness Approaches
 
+📋 **See [`README.md`](README.md) for quick start guide and overview**  
+📋 **See [`BRANCHES.md`](BRANCHES.md) for detailed branch comparison and results**
+
+---
+
 ## Overview
 
 **4 Allocation Policies** (determine HOW to rank patients):
