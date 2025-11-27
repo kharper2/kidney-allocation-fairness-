@@ -384,24 +384,19 @@ From test runs (5,000 patients, 1,000 donors):
 
 ### What Still Needs To Be Done ⏳
 
-#### HIGH PRIORITY (This Week)
-1. **Run final experiments** (Natalie) - Use full dataset (150k patients, 20k donors) or large sample (50k patients, 10k donors)
-   - Run: `./run_full_pipeline.sh` (uses 20k patients, 3k donors by default)
-   - Or customize sample sizes in the script for full data
-   - Generate final publication-ready figures
-   - **Time:** ~5 minutes with default settings
-2. **Write Results section** (Jessie lead): Interpret figures, insert tables
-3. **Write Discussion section** (Ella lead): Policy implications, trade-offs
+**⚠️ DEADLINE: 1 WEEK**
 
-#### MEDIUM PRIORITY (Next Week)
-4. **Expand Methods section**: Algorithm details, parameter choices
-5. **Literature review**: Background section, related work
-6. **Complete Introduction**: Motivation, contributions
-
-#### LOWER PRIORITY (Before Submission)
-7. **Team Contributions section**: Individual roles
-8. **Limitations & Ethics**: Synthetic data, fairness definitions
-9. **Final polish**: Proofread, spell check, LaTeX compilation
+1. **Run final experiments** (Natalie) - Run `./run_full_pipeline.sh` with full data
+2. **Results section** (Jessie) - Insert figures, tables, interpret findings
+3. **Discussion section** (Ella) - Policy implications, trade-offs, when to use each
+4. **Methods section** (Olivia) - Expand algorithm details, parameter choices
+5. **Background section** (Natalia) - Literature review, related work, cite SRTR/OPTN
+6. **Introduction** (Everyone) - Expand motivation and contributions
+7. **Experiments section** (Kathryn) - Document parameters and setup
+8. **Data & Simulation section** (Ella) - Describe data generation
+9. **Limitations & Ethics** (Everyone) - Synthetic data limits, fairness definitions
+10. **Team Contributions** (Everyone) - Each person writes their paragraph
+11. **Final compilation & proofread** (Everyone) - Compile LaTeX, check figures, proofread
 
 ### Work Division
 
@@ -421,12 +416,11 @@ From test runs (5,000 patients, 1,000 donors):
 - Introduction
 - Final proofreading
 
-### Timeline Estimate
+### Time Estimate
 
-- **This week**: Complete HIGH priority items (6-8 hours)
-- **Next week**: Complete MEDIUM priority items (6-8 hours)
-- **Week after**: Complete LOWER priority, final polish (4-6 hours)
-- **Total**: ~15-20 hours divided among 6 people
+**Total work remaining:** ~18-20 hours ÷ 6 people = **~3-4 hours per person**
+
+**Critical:** Natalie must run final experiments first - everything else depends on having results!
 
 ---
 
