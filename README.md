@@ -405,9 +405,10 @@ From proof-of-concept run (5,000 patients, 1,000 donors sampled from our data):
 
 - ✅ Complete code implementation (all 4 policies)
 - ✅ Full automation pipeline
+- ✅ **3 fairness approaches** (single-dimension, composite, weighted multi-dimensional)
 - ✅ LaTeX paper structure with page estimates
 - ✅ Google Colab notebook
-- ✅ Sample results and figures
+- ✅ Sample results and figures (proof-of-concept with small samples)
 - ✅ Comprehensive documentation
 
 ### What's Been Done ✅
@@ -416,7 +417,7 @@ From proof-of-concept run (5,000 patients, 1,000 donors sampled from our data):
 |--------|----------------|
 | **Ella** | Generated patient & donor data (~150k patients, ~20k donors) |
 | **Natalie** | Urgency score feature engineering (log dialysis time) |
-| **Kathryn** | Complete code implementation (all 4 policies), automation pipeline, scripts, LaTeX structure, Colab notebook, documentation, GitHub setup, **proof-of-concept run** (sampled 5k patients and 1k donors from our actual data files to verify pipeline works end-to-end) |
+| **Kathryn** | Complete code implementation (all 4 policies), automation pipeline, scripts, LaTeX structure, Colab notebook, documentation, GitHub setup, **3 fairness approaches** (single-dimension, composite groups, weighted multi-dimensional), **proof-of-concept tests** on all branches (2k-5k patients to verify everything works) |
 
 ### What Still Needs To Be Done ⏳
 
