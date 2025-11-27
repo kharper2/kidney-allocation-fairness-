@@ -2,6 +2,8 @@
 
 This repository has **3 branches** for different fairness approaches:
 
+⚠️ **IMPORTANT:** All branches have been tested with **small sample sizes (2k-5k patients, 500-1k donors)** for proof-of-concept. **Final experiments need to be run with full dataset (20k-150k patients, 3k-20k donors)** for the paper.
+
 ---
 
 ## 🌳 Branch Overview
@@ -59,10 +61,11 @@ python scripts/run_sweep.py \
   --group_col Ethnicity_SES
 ```
 
-**Test results:**
+**Test results (2k patients, 500 donors):**
 - 15 composite groups created
 - 90% disparity reduction
 - BUT: Sparse groups reduce allocations (375/500)
+- ⚠️ **Need to run on full dataset (20k-50k patients) for final paper**
 
 ---
 
@@ -95,15 +98,18 @@ python scripts/run_multidim_sweep.py \
   --etas 0 1.0
 ```
 
-**Test results:**
+**Test results (2k patients, 500 donors):**
 - **+37.8% more benefit** vs composite
 - **Better fairness** (L1 = 0.003 vs 0.006)
 - **More allocations** (500 vs 375)
 - **Dominates composite approach!**
+- ⚠️ **Need to run on full dataset (20k-50k patients) for final paper**
 
 ---
 
 ## 📊 Comparison Table
+
+⚠️ **Note:** These results are from proof-of-concept tests with **2k patients, 500 donors**. Final results will differ with full dataset.
 
 | Metric | Main (Single) | Composite | Multi-Dimensional |
 |--------|---------------|-----------|-------------------|
