@@ -139,25 +139,32 @@ This repository has **3 branches** testing different fairness approaches. All te
 ---
 
 ### 📌 `main` - Single-Dimension Fairness (Baseline)
-**Status:** ✅ **READY FOR SUBMISSION**
+**Status:** ✅ **IMPLEMENTED & TESTED** - ⚠️ **NEEDS FULL DATASET RUN FOR SUBMISSION**
 
 **What it does:**
 - Balances fairness across ONE dimension at a time (Ethnicity OR SES)
 - Run separate experiments for each dimension, compare results
 - Standard approach in most allocation research
+- **Safest baseline** - most straightforward implementation
 
-**Test Results (5k patients, 1k donors, Ethnicity fairness):**
+**Test Results (Proof-of-concept: 5k patients, 1k donors, Ethnicity fairness):**
 - Hybrid+Fair (α=0.5, η=1.0): **8,960 years** benefit, L1=0.0008, **960/1,000** allocated
+- ⚠️ **These are preliminary results - must run with 20k-150k patients, 3k-20k donors for final paper**
 
 **Why this result makes sense:**
 - ✅ **Excellent fairness:** L1=0.0008 means each ethnic group within 0.08% of proportional share
 - ✅ **High efficiency:** 96% organs allocated
 - ⚠️ **Limitation:** Only considers ONE dimension (can't balance ethnicity AND SES simultaneously)
 
+**For Submission:**
+- Code is complete and tested
+- Pipeline verified with small samples
+- **MUST run final experiments with full dataset before submitting paper**
+
 ---
 
 ### 📌 `composite-fairness` - Intersectional Groups
-**Status:** ✅ **IMPLEMENTED & TESTED**
+**Status:** ✅ **IMPLEMENTED & TESTED** - ⚠️ **NEEDS FULL DATASET RUN FOR SUBMISSION**
 
 **What it does:**
 - Creates **intersectional groups** by combining attributes
@@ -165,9 +172,10 @@ This repository has **3 branches** testing different fairness approaches. All te
 - Treats each combination as distinct demographic group
 - Balances across ALL 15 groups simultaneously
 
-**Test Results (5k patients, 1k donors, 15 composite groups):**
+**Test Results (Proof-of-concept: 5k patients, 1k donors, 15 composite groups):**
 - Hybrid+Fair (α=0.5, η=1.0): **7,708 years** benefit, L1=0.002, **897/1,000** allocated (⚠️ 10% wasted!)
 - 15 composite groups created: Largest = Black_Middle (26,227 patients), Smallest = Other_High (527 patients)
+- ⚠️ **These are preliminary results - must run with 20k-150k patients, 3k-20k donors for final paper**
 
 **Why this result makes sense:**
 - ✅ **Good intersectional fairness:** L1=0.002 means intersectional groups balanced
@@ -176,10 +184,15 @@ This repository has **3 branches** testing different fairness approaches. All te
 - **Example:** Donor is Type AB, needs "Other_Low" patient (662 total), no Type AB in that group → kidney unused
 - **14% worse than single-dimension** due to sparsity constraints
 
+**For Submission:**
+- Code is complete and tested
+- Pipeline verified with small samples
+- **MUST run final experiments with full dataset before submitting paper**
+
 ---
 
 ### 📌 `multidim-fairness` - Weighted Multi-Dimensional ⭐ **RECOMMENDED**
-**Status:** ✅ **IMPLEMENTED & TESTED**
+**Status:** ✅ **IMPLEMENTED & TESTED** - ⚠️ **NEEDS FULL DATASET RUN FOR SUBMISSION**
 
 **What it does:**
 - Tracks **multiple dimensions independently** (Ethnicity AND SES)
@@ -202,8 +215,9 @@ Patient: White, High-SES
 - Combined score: 0.7×(+12%) + 0.3×(+8%) = +10.8% (low priority)
 ```
 
-**Test Results (5k patients, 1k donors, 70% Ethnicity + 30% SES):**
+**Test Results (Proof-of-concept: 5k patients, 1k donors, 70% Ethnicity + 30% SES):**
 - Hybrid+Fair (α=0.5, η=1.0): **9,535 years** benefit, L1=0.0008, **1,000/1,000** allocated (✅ 100%!)
+- ⚠️ **These are preliminary results - must run with 20k-150k patients, 3k-20k donors for final paper**
 
 **Why this result makes sense:**
 - ✅ **Best efficiency:** ALL organs allocated (no waste!)
@@ -212,6 +226,12 @@ Patient: White, High-SES
 - ✅ **+6% better than single-dimension** while balancing BOTH dimensions!
 - **Why it works:** Tracks 8 groups (5 ethnicities + 3 SES), not 15 intersections → always has compatible matches
 - **Flexibility:** Can prioritize "Black OR Low-SES" patients → more options → better matches
+
+**For Submission:**
+- Code is complete and tested
+- Pipeline verified with small samples
+- **MUST run final experiments with full dataset before submitting paper**
+- **Recommended approach** for final paper (best results)
 
 ---
 
