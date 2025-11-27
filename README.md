@@ -424,18 +424,6 @@ From test runs (5,000 patients, 1,000 donors):
 
 ---
 
-## 🎓 Graduate Credit Options
-
-The repository supports several graduate-level extensions:
-
-1. **ML Survival Surrogate** - Replace parametric model with trained predictor
-2. **Weight Optimization** - Automated α/η tuning to target metrics
-3. **Enhanced Fairness** - Max-min or proportional fairness mechanisms
-4. **Sensitivity Suite** - Comprehensive stress tests and ablations
-5. **Complete Pipeline** - This reproducible framework (already done!)
-
----
-
 ## 🆘 Troubleshooting
 
 ### Common Issues
