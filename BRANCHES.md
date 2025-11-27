@@ -179,10 +179,12 @@ Patient B: White, High-SES
 Algorithm prioritizes Patient A to reduce deficits on BOTH dimensions.
 
 ### How to Use
+
+**2 Dimensions (Example):**
 ```bash
 git checkout multidim-fairness
 
-# Run multi-dimensional sweep
+# Run multi-dimensional sweep with 2 dimensions
 python scripts/run_multidim_sweep.py \
   --patients data/patients_with_ses.csv \
   --donors data/donors.csv \
@@ -191,6 +193,30 @@ python scripts/run_multidim_sweep.py \
   --alphas 0.25 0.5 0.75 \
   --etas 0 1.0
 ```
+
+**3+ Dimensions (Supported!):**
+```bash
+# Example with 3 dimensions: Ethnicity, SES, and Blood Type
+python scripts/run_multidim_sweep.py \
+  --patients data/patients_with_ses.csv \
+  --donors data/donors.csv \
+  --fairness_dims Ethnicity SES BloodType \
+  --fairness_weights 0.5 0.3 0.2 \
+  --alphas 0.5 \
+  --etas 0 1.0
+
+# Example with 4 dimensions: Ethnicity, SES, Age Group, Geographic Region
+# (assuming you have AgeGroup and Region columns)
+python scripts/run_multidim_sweep.py \
+  --patients data/patients_with_ses.csv \
+  --donors data/donors.csv \
+  --fairness_dims Ethnicity SES AgeGroup Region \
+  --fairness_weights 0.4 0.3 0.2 0.1 \
+  --alphas 0.5 \
+  --etas 0 1.0
+```
+
+**Note:** Weights are automatically normalized (they don't need to sum to 1.0). The algorithm tracks each dimension independently and combines deficits with your specified weights.
 
 ### Test Results (5k patients, 1k donors, 70% Ethnicity + 30% SES)
 

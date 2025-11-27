@@ -101,9 +101,10 @@ scripts/
 - Upload or Google Drive options
 
 ### Sample Results (Preliminary - Test Run)
-- ✅ 8 policy configurations tested (with 5k patients, 1k donors)
-- ✅ 3 example figures generated to show output format
-- ✅ Pipeline verified and working
+- ✅ **8 policy configurations tested per branch** (Urgency, Utility, Hybrid α=0.25/0.5/0.75, Hybrid+Fair α=0.25/0.5/0.75)
+- ✅ **All 3 branches tested** (main, composite-fairness, multidim-fairness)
+- ✅ **3 figure types generated** per branch (urgency vs benefit, fairness vs benefit, summary bars)
+- ✅ Pipeline verified and working across all branches
 
 ---
 
