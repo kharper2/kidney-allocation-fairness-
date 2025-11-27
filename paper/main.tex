@@ -1,0 +1,138 @@
+
+\documentclass{article}
+\usepackage{geometry}
+\geometry{a4paper, margin=1in}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{caption}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta, positioning}
+
+\title{\textbf{AI and Decision Making in Kidney Allocation: Balancing Urgency, Utility, and Fairness}}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\begin{center}
+    \begin{tabular}{cc}
+        \begin{tabular}{c}
+            \textbf{Natalie Barnouw} \\
+            Massachusetts Institute of Technology \\
+            \texttt{nbarnouw@mit.edu}
+        \end{tabular}
+        &
+        \begin{tabular}{c}
+            \textbf{Olivia Joseph} \\
+            Massachusetts Institute of Technology \\
+            \texttt{oliviajo@mit.edu}
+        \end{tabular}
+        \\[0.8em]
+        \begin{tabular}{c}
+            \textbf{Ella Tubbs} \\
+            Massachusetts Institute of Technology \\
+            \texttt{tubbs@mit.edu}
+        \end{tabular}
+        &
+        \begin{tabular}{c}
+            \textbf{Jessie Liu} \\
+            Massachusetts Institute of Technology \\
+            \texttt{jessliu@mit.edu}
+        \end{tabular}
+        \\[0.8em]
+        \begin{tabular}{c}
+            \textbf{Kathryn Harper} \\
+            Harvard University \\
+            \texttt{kharper@college.harvard.edu}
+        \end{tabular}
+        &
+        \begin{tabular}{c}
+            \textbf{Natalia Siwek} \\
+            Harvard University \\
+            \texttt{nataliasiwek@college.harvard.edu}
+        \end{tabular}
+    \end{tabular}
+\end{center}
+
+\section{Abstract (0.5 page)}
+\noindent We study kidney allocation as a multi-objective decision problem that must balance \emph{urgency} (save the sickest), \emph{utility} (maximize survival benefit), and \emph{fairness} (equitable access across groups). Using a large synthetic cohort of waitlisted candidates and donors, we compare four transparent allocation policies: (i) urgency-only, (ii) utility-only, (iii) hybrid urgency--utility with weight grid search, and (iv) fairness-constrained hybrid with dynamic underrepresentation adjustments. We encode urgency with $\log(1+\text{DialysisYears})$ and encode survival benefit from simple parametric post-/no-transplant models based on EPTS (candidate) and KDPI (donor). We quantify trade-offs across clinical benefit, mean recipient urgency, and allocation disparity by group, and we release a lightweight evaluation pipeline to enable further policy experimentation.
+
+\section{Introduction (0.5--1 page)}
+\noindent Kidney allocation in practice must reconcile competing aims: prioritizing candidates at highest medical risk, allocating organs to maximize expected survival, and ensuring access is equitable across demographic and clinical groups. This paper builds a simulation to analyze these trade-offs, focusing on simple, interpretable scoring rules for urgency and utility and fairness-aware adjustments. Our contributions are: (1) baseline policies that practitioners can inspect and audit; (2) a tunable hybrid score with grid search over urgency/utility weights; (3) a fairness-aware adjustment that counters underrepresentation during online allocation; and (4) a standardized evaluation suite for trade-off analysis. Public reporting from SRTR and current OPTN policy provide the broader institutional context for real-world allocation systems.
+
+\section{Background and Related Work (2--3 pages)}
+\subsection{Clinical and policy context}
+\noindent ABO compatibility, candidate risk (e.g., dialysis exposure, diabetes), and donor organ quality (e.g., KDPI) are common drivers of clinical and policy choices in kidney transplantation; EPTS summarizes candidate expected post-transplant survival.
+
+\subsection{Algorithmic approaches}
+\noindent Prior algorithmic work spans rule-based priority queues, constrained scoring, and matching/optimization under fairness or utility objectives. We adopt a transparent, formula-based approach for this paper and outline how an ML survival surrogate and weight optimization module could be substituted in future work.
+
+\section{Data and Simulation Setup (0.5--1 page)}
+\noindent \textbf{Synthetic cohorts.} We use a simulated waitlist (e.g., 150{,}000 candidates) and donor stream (e.g., 20{,}000 donors) with fields: candidate Age, DialysisYears, Diabetes, EPTSScore, BloodType, Ethnicity; donor KDPI, DonorBloodType, DonorAge. \\
+\textbf{Compatibility.} ABO rules for kidney transplant (O donors $\rightarrow$ all types; A $\rightarrow$ A/AB; B $\rightarrow$ B/AB; AB $\rightarrow$ AB). \\
+\textbf{Reproducibility.} All analyses are scripted with fixed random seeds and exported tables/figures.
+
+\section{Methods: Scoring and Policies (2--3 pages)}
+\subsection{Urgency and utility encodings}
+\noindent \textbf{Urgency.} For candidate $i$,
+\begin{equation}
+\mathrm{Urgency}_i = \alpha \log(1+\mathrm{DialysisYears}_i) + \beta \cdot \mathbf{1}[\mathrm{Diabetes}_i],
+\end{equation}
+min–max normalized over the waitlist. \\
+\textbf{Post-transplant survival.} With EPTS $E_i\in[0,1]$, KDPI $K_d\in[0,1]$, and $\mathrm{Age80}_i=\min(\mathrm{Age}_i,80)/80$,
+\begin{equation}
+S^{\mathrm{post}}_{i,d} = \theta_0 + \theta_1(1-E_i) + \theta_2(1-K_d) + \theta_3(1-\mathrm{Age80}_i) + \theta_4(1-E_i)(1-K_d).
+\end{equation}
+\textbf{No-transplant survival.}
+\begin{equation}
+S^{\mathrm{no}}_{i} = \gamma_0 - \gamma_1 \mathrm{DialysisYears}_i - \gamma_2 \mathbf{1}[\mathrm{Diabetes}_i] - \gamma_3 \mathrm{Age80}_i.
+\end{equation}
+\textbf{Utility (survival benefit).} $B_{i,d}=\max\{S^{\mathrm{post}}_{i,d}-S^{\mathrm{no}}_{i}, 0\}$.
+
+\subsection{Policies}
+\noindent \textbf{Urgency-only.} Among ABO-compatible candidates, allocate to maximal normalized $\mathrm{Urgency}_i$. \\
+\textbf{Utility-only.} Allocate to maximal $B_{i,d}$. \\
+\textbf{Hybrid.} $H_{i,d}=\lambda \,\widehat{\mathrm{Urgency}}_i + (1-\lambda)\,\widehat{B}_{i,d}$, $\lambda\in[0,1]$ (grid search). \\
+\textbf{Fairness-constrained hybrid.} Let $g(i)$ be the candidate group (e.g., Ethnicity/SES). With $p_g$ the group’s waitlist share and $a_g(t)$ its allocation share so far at step $t$,
+\begin{equation}
+H^\mathrm{fair}_{i,d}(t) = H_{i,d} + \eta \left(p_{g(i)} - a_{g(i)}(t)\right).
+\end{equation}
+
+\section{Experiments (1--2 pages)}
+\noindent \textbf{Comparisons.} Urgency-only, Utility-only, Hybrid ($\lambda$ grid), and Fairness-constrained ($\eta$ grid). \\
+\textbf{Outcomes.} Total survival benefit, mean recipient urgency, allocation shares by group, disparity (L1), and organ quality distribution to recipients. \\
+\textbf{Stress tests.} Donor supply and KDPI mix; dialysis-duration mix; group composition. \\
+\textbf{Ablations.} Remove interaction term $(1-E_i)(1-K_d)$; vary urgency weights; alternative fairness mechanisms.
+
+\section{Results (1--2 pages)}
+\noindent We summarize the urgency–benefit and fairness–benefit trade-offs. Example figures to include:
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.85\linewidth]{tradeoff_urgency_vs_benefit.png}
+    \caption{Trade-off: mean recipient urgency vs. total survival benefit (demo sample).}
+\end{figure}
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.85\linewidth]{tradeoff_fairness_vs_benefit.png}
+    \caption{Trade-off: allocation disparity (L1) vs. total survival benefit (demo sample).}
+\end{figure}
+
+\section{Discussion (1 page)}
+\noindent We interpret policy trade-offs, highlight situations where urgency/utility/fairness weighting differs by institutional priorities, and discuss robustness/sensitivity observations.
+
+\section{Limitations and Ethical Considerations (0.5 page)}
+\noindent Synthetic data and simplified survival assumptions; omitted clinical factors; risk of bias when using group-aware adjustments; non-deployability without rigorous validation.
+
+\section{Team Contributions and Graduate Credit (1 page)}
+\noindent Outline individual responsibilities (data generation; policy design and implementation; fairness mechanism; evaluation suite; literature review; ML survival surrogate; weight optimization). Graduate credit components include the fairness-aware online allocation algorithm, sensitivity/stress-test suite, and reproducible software artifacts.
+
+\section{Conclusion (0.25 page)}
+\noindent We presented a transparent policy analysis for kidney allocation and quantified the urgency–utility–fairness trade-offs. Future work: ML survival surrogate and constrained optimization to targets (e.g., disparity caps).
+
+\bibliographystyle{plain}
+\bibliography{refs}
+
+\end{document}
