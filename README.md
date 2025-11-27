@@ -11,13 +11,14 @@
 
 1. [Quick Start (3 Commands)](#-quick-start-3-commands)
 2. [What's Included](#-whats-included)
-3. [Detailed Usage Guide](#-detailed-usage-guide)
-4. [Understanding Results](#-understanding-results)
-5. [Google Colab (No Setup)](#-google-colab-no-setup)
-6. [Project Status](#-project-status)
-7. [Submission Checklist](#-submission-checklist)
-8. [Team Roles & Next Steps](#-team-roles--next-steps)
-9. [Citation & License](#-citation--license)
+3. [Repository Branches](#-repository-branches)
+4. [Detailed Usage Guide](#-detailed-usage-guide)
+5. [Understanding Results](#-understanding-results)
+6. [Google Colab (No Setup)](#-google-colab-no-setup)
+7. [Project Status](#-project-status)
+8. [Submission Checklist](#-submission-checklist)
+9. [Team Roles & Next Steps](#-team-roles--next-steps)
+10. [Citation & License](#-citation--license)
 
 ---
 
@@ -100,6 +101,33 @@ scripts/
 - ✅ 3 example figures generated to show output format
 - ✅ Pipeline verified and working
 - ⚠️ **Final experiments with full data (150k patients, 20k donors) still need to be run for paper**
+
+---
+
+## 🌳 Repository Branches
+
+This repository has **3 branches** with different fairness approaches:
+
+### 📌 `main` - Base Project (Submission Version)
+**Status:** ✅ **READY FOR SUBMISSION**
+
+Single-dimension fairness (Ethnicity OR SES, analyzed separately)
+
+### 📌 `composite-fairness` - Intersectional Groups  
+**Status:** ✅ **IMPLEMENTED & TESTED**
+
+Combines attributes into composite groups (e.g., "Black_Low", "White_Middle")  
+**Good for:** True intersectionality (Black women as distinct group)  
+**Test:** 90% disparity reduction, but sparse groups reduce allocations
+
+### 📌 `multidim-fairness` - Weighted Multi-Dimensional ⭐  
+**Status:** ✅ **IMPLEMENTED & TESTED** - **RECOMMENDED**
+
+Tracks dimensions independently with configurable weights (e.g., 70% ethnicity, 30% SES)  
+**Best for:** Flexibility, scalability, **37% more benefit** than composite!  
+**Test:** Better on ALL metrics vs composite
+
+**📋 See `BRANCHES.md` for detailed comparison and usage instructions**
 
 ---
 
@@ -394,7 +422,10 @@ From proof-of-concept run (5,000 patients, 1,000 donors sampled from our data):
 
 **⚠️ DEADLINE: 1 WEEK**
 
-1. **Run final experiments with full dataset** - Run `./run_full_pipeline.sh` (needs to be done FIRST)
+1. **Run final experiments with full dataset** (needs to be done FIRST)
+   - **Main branch**: Run `./run_full_pipeline.sh` with larger samples (20k-50k patients)
+   - **Multidim-fairness branch** (recommended): Run `scripts/run_multidim_sweep.py` with full data
+   - ⚠️ All current results are from small test runs (2k-5k patients) for proof-of-concept
 2. **Results section** - Insert figures, tables, interpret findings
 3. **Discussion section** - Policy implications, trade-offs, when to use each policy
 4. **Methods section** - Expand algorithm details, parameter choices
