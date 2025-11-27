@@ -227,11 +227,11 @@ open main.pdf  # or xdg-open on Linux
   - `SES`: Socioeconomic status
   - Any column in patient data
 
-### Sample Results (Preliminary Test Run)
+### Sample Results (Preliminary - Proof of Concept)
 
-**⚠️ Note:** These are from a small test run (5,000 patients, 1,000 donors) to verify the pipeline works. **Final experiments with full data (150k patients, 20k donors) need to be run for the paper.**
+**⚠️ Note:** These are from a proof-of-concept run using **our actual data files** (`patients.csv` and `donors.csv`) but sampled to 5,000 patients and 1,000 donors to quickly verify the pipeline works end-to-end. **Final experiments need to be run with larger samples (20k-150k patients, 3k-20k donors) for the paper.**
 
-From test runs (5,000 patients, 1,000 donors):
+From proof-of-concept run (5,000 patients, 1,000 donors sampled from our data):
 
 | Policy | Total Benefit | Mean Urgency | Fairness L1 |
 |--------|--------------|--------------|-------------|
@@ -388,7 +388,7 @@ From test runs (5,000 patients, 1,000 donors):
 |--------|----------------|
 | **Ella** | Generated patient & donor data (~150k patients, ~20k donors) |
 | **Natalie** | Urgency score feature engineering (log dialysis time) |
-| **Kathryn** | Complete code implementation (all 4 policies), automation pipeline, scripts, LaTeX structure, Colab notebook, documentation, GitHub setup, **proof-of-concept test run** (5k patients, 1k donors to verify everything works) |
+| **Kathryn** | Complete code implementation (all 4 policies), automation pipeline, scripts, LaTeX structure, Colab notebook, documentation, GitHub setup, **proof-of-concept run** (sampled 5k patients and 1k donors from our actual data files to verify pipeline works end-to-end) |
 
 ### What Still Needs To Be Done ⏳
 
