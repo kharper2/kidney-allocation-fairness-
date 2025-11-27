@@ -95,11 +95,11 @@ scripts/
 - No local Python installation required
 - Upload or Google Drive options
 
-### Sample Results
-- ✅ 8 policy configurations tested
-- ✅ 3 publication-ready figures generated
-- ✅ LaTeX table ready to insert
-- ✅ Key findings documented
+### Sample Results (Preliminary - Test Run)
+- ✅ 8 policy configurations tested (with 5k patients, 1k donors)
+- ✅ 3 example figures generated to show output format
+- ✅ Pipeline verified and working
+- ⚠️ **Final experiments with full data (150k patients, 20k donors) still need to be run for paper**
 
 ---
 
@@ -160,7 +160,7 @@ python scripts/run_sweep.py \
 
 ### Generating Plots
 
-```bash
+   ```bash
 python scripts/generate_plots.py \
   --summary data/summary.csv \
   --outdir figures
@@ -227,7 +227,9 @@ open main.pdf  # or xdg-open on Linux
   - `SES`: Socioeconomic status
   - Any column in patient data
 
-### Sample Results
+### Sample Results (Preliminary Test Run)
+
+**⚠️ Note:** These are from a small test run (5,000 patients, 1,000 donors) to verify the pipeline works. **Final experiments with full data (150k patients, 20k donors) need to be run for the paper.**
 
 From test runs (5,000 patients, 1,000 donors):
 
@@ -238,11 +240,11 @@ From test runs (5,000 patients, 1,000 donors):
 | **Hybrid+Fair** | 9,749 years | 0.628 | **0.0004** |
 | **Urgency** | 8,038 years | **0.767** | 0.020 |
 
-**Key Findings:**
+**Preliminary Findings (will be updated with full data):**
 - 🎯 **29% benefit gain**: Utility vs Urgency
 - 🎯 **97% disparity reduction**: With fairness constraints
 - 🎯 **3.5% benefit cost**: For fairness enforcement
-- 🎯 **α = 0.25**: Optimal balance
+- 🎯 **α = 0.25**: Appears optimal (needs verification with full data)
 
 ### Understanding the Figures
 
@@ -383,9 +385,13 @@ From test runs (5,000 patients, 1,000 donors):
 ### What Still Needs To Be Done ⏳
 
 #### HIGH PRIORITY (This Week)
-1. **Run final experiments** with large samples (20k-50k patients)
-2. **Write Results section**: Interpret figures, insert tables
-3. **Write Discussion section**: Policy implications, trade-offs
+1. **Run final experiments** (Natalie) - Use full dataset (150k patients, 20k donors) or large sample (50k patients, 10k donors)
+   - Run: `./run_full_pipeline.sh` (uses 20k patients, 3k donors by default)
+   - Or customize sample sizes in the script for full data
+   - Generate final publication-ready figures
+   - **Time:** ~5 minutes with default settings
+2. **Write Results section** (Jessie lead): Interpret figures, insert tables
+3. **Write Discussion section** (Ella lead): Policy implications, trade-offs
 
 #### MEDIUM PRIORITY (Next Week)
 4. **Expand Methods section**: Algorithm details, parameter choices
@@ -397,18 +403,23 @@ From test runs (5,000 patients, 1,000 donors):
 8. **Limitations & Ethics**: Synthetic data, fairness definitions
 9. **Final polish**: Proofread, spell check, LaTeX compilation
 
-### Suggested Work Division
+### Work Division
 
-| Person | Primary Responsibilities |
-|--------|-------------------------|
-| **Natalie** | Data/simulation section, run final experiments |
-| **Olivia** | Methods section, algorithm details |
-| **Ella** | Fairness mechanism, ethics discussion |
-| **Jessie** | Results section, figures, analysis |
-| **Kathryn** | Integration, pipeline, experiments section |
-| **Natalia** | Background/literature review, introduction |
+| Person | Completed ✅ | To Do ⏳ |
+|--------|-------------|----------|
+| **Ella** | Generated patient & donor data (~150k, ~20k rows) | Discussion section, ethics/limitations |
+| **Natalie** | Urgency score feature engineering | **Run final experiments with full data** |
+| **Kathryn** | Code implementation (all 4 policies), automation pipeline, scripts, LaTeX structure, Colab notebook, documentation, GitHub setup | Experiments section write-up |
+| **Olivia** | - | Methods section (algorithm details, parameters) |
+| **Jessie** | - | Results section (figures, tables, interpretation) |
+| **Natalia** | - | Background/literature review, introduction |
 
-**Everyone**: Discussion, limitations, team contributions
+**Everyone Contributes To:**
+- Discussion section
+- Limitations & ethical considerations
+- Team contributions section (each person writes their part)
+- Introduction
+- Final proofreading
 
 ### Timeline Estimate
 
