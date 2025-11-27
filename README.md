@@ -457,15 +457,6 @@ ls data/  # verify files exist
 
 ---
 
-## 📞 Getting Help
-
-**Quick questions**: Check the relevant section above  
-**Code issues**: Open a GitHub issue  
-**Paper questions**: Discuss in team meeting  
-**Bugs**: Open issue with error message and steps to reproduce
-
----
-
 ## 📚 Citation & License
 
 ### Citing This Work
