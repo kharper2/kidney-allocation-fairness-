@@ -7,6 +7,10 @@
 
 ---
 
+⚠️ **IMPORTANT:** All current results are from **proof-of-concept runs with 5,000 patients, 1,000 donors** (sampled from full dataset). All branches are **IMPLEMENTED & TESTED**, but **FINAL EXPERIMENTS MUST USE 20k-150k patients, 3k-20k donors for the paper.**
+
+---
+
 ## 📑 Table of Contents
 
 1. [Quick Start (3 Commands)](#-quick-start-3-commands)
@@ -100,15 +104,12 @@ scripts/
 - ✅ 8 policy configurations tested (with 5k patients, 1k donors)
 - ✅ 3 example figures generated to show output format
 - ✅ Pipeline verified and working
-- ⚠️ **Final experiments with full data (150k patients, 20k donors) still need to be run for paper**
 
 ---
 
 ## 🌳 Repository Branches - Three Fairness Approaches
 
-This repository has **3 branches** testing different fairness approaches. All tested with **5,000 patients, 1,000 donors** (proof-of-concept).
-
-⚠️ **IMPORTANT:** All branches are **IMPLEMENTED & TESTED** but **NEED FULL DATASET RUNS (20k-150k patients, 3k-20k donors) for final paper.**
+This repository has **3 branches** testing different fairness approaches.
 
 ### Quick Summary
 
@@ -249,10 +250,6 @@ open main.pdf  # or xdg-open on Linux
   - Any column in patient data
 
 ### Sample Results (Preliminary - Proof of Concept)
-
-**⚠️ IMPORTANT:** All results are from proof-of-concept runs with **5,000 patients, 1,000 donors** (sampled from full dataset). 
-
-**🚨 Final experiments MUST be run with 20k-150k patients, 3k-20k donors for the paper!**
 
 **Key Findings:**
 - 🎯 **+29% benefit gain**: Utility vs Urgency (10,391 vs 8,038 years)
@@ -414,7 +411,6 @@ open main.pdf  # or xdg-open on Linux
 1. **Run final experiments with full dataset** (needs to be done FIRST)
    - **Main branch**: Run `./run_full_pipeline.sh` with larger samples (20k-50k patients)
    - **Multidim-fairness branch** (recommended): Run `scripts/run_multidim_sweep.py` with full data
-   - ⚠️ All current results are from small test runs (2k-5k patients) for proof-of-concept
 2. **Results section** - Insert figures, tables, interpret findings
 3. **Discussion section** - Policy implications, trade-offs, when to use each policy
 4. **Methods section** - Expand algorithm details, parameter choices
