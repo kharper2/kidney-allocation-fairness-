@@ -382,45 +382,33 @@ From test runs (5,000 patients, 1,000 donors):
 - ✅ Sample results and figures
 - ✅ Comprehensive documentation
 
+### What's Been Done ✅
+
+| Person | Work Completed |
+|--------|----------------|
+| **Ella** | Generated patient & donor data (~150k patients, ~20k donors) |
+| **Natalie** | Urgency score feature engineering (log dialysis time) |
+| **Kathryn** | Complete code implementation (all 4 policies), automation pipeline, scripts, LaTeX structure, Colab notebook, documentation, GitHub setup, **proof-of-concept test run** (5k patients, 1k donors to verify everything works) |
+
 ### What Still Needs To Be Done ⏳
 
 **⚠️ DEADLINE: 1 WEEK**
 
-1. **Run final experiments** (Natalie) - Run `./run_full_pipeline.sh` with full data
-2. **Results section** (Jessie) - Insert figures, tables, interpret findings
-3. **Discussion section** (Ella) - Policy implications, trade-offs, when to use each
-4. **Methods section** (Olivia) - Expand algorithm details, parameter choices
-5. **Background section** (Natalia) - Literature review, related work, cite SRTR/OPTN
-6. **Introduction** (Everyone) - Expand motivation and contributions
-7. **Experiments section** (Kathryn) - Document parameters and setup
-8. **Data & Simulation section** (Ella) - Describe data generation
-9. **Limitations & Ethics** (Everyone) - Synthetic data limits, fairness definitions
-10. **Team Contributions** (Everyone) - Each person writes their paragraph
-11. **Final compilation & proofread** (Everyone) - Compile LaTeX, check figures, proofread
+1. **Run final experiments with full dataset** - Run `./run_full_pipeline.sh` (needs to be done FIRST)
+2. **Results section** - Insert figures, tables, interpret findings
+3. **Discussion section** - Policy implications, trade-offs, when to use each policy
+4. **Methods section** - Expand algorithm details, parameter choices
+5. **Background section** - Literature review, related work, cite SRTR/OPTN
+6. **Introduction** - Expand motivation and contributions
+7. **Experiments section** - Document parameters and setup used
+8. **Data & Simulation section** - Describe data generation process
+9. **Limitations & Ethics** - Synthetic data limits, fairness definitions, non-deployability
+10. **Team Contributions** - Each person writes their paragraph
+11. **Final compilation & proofread** - Compile LaTeX, check figures, proofread
 
-### Work Division
+**Time estimate:** ~18-20 hours total ÷ 6 people = **~3-4 hours per person**
 
-| Person | Completed ✅ | To Do ⏳ |
-|--------|-------------|----------|
-| **Ella** | Generated patient & donor data (~150k, ~20k rows) | Discussion section, ethics/limitations |
-| **Natalie** | Urgency score feature engineering | **Run final experiments with full data** |
-| **Kathryn** | Code implementation (all 4 policies), automation pipeline, scripts, LaTeX structure, Colab notebook, documentation, GitHub setup | Experiments section write-up |
-| **Olivia** | - | Methods section (algorithm details, parameters) |
-| **Jessie** | - | Results section (figures, tables, interpretation) |
-| **Natalia** | - | Background/literature review, introduction |
-
-**Everyone Contributes To:**
-- Discussion section
-- Limitations & ethical considerations
-- Team contributions section (each person writes their part)
-- Introduction
-- Final proofreading
-
-### Time Estimate
-
-**Total work remaining:** ~18-20 hours ÷ 6 people = **~3-4 hours per person**
-
-**Critical:** Natalie must run final experiments first - everything else depends on having results!
+**🚨 Critical:** Someone must run final experiments first - everything else depends on having actual results!
 
 ---
 
