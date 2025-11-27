@@ -101,7 +101,15 @@ scripts/
 - Upload or Google Drive options
 
 ### Sample Results (Preliminary - Test Run)
-- ✅ **8 policy configurations tested per branch** (Urgency, Utility, Hybrid α=0.25/0.5/0.75, Hybrid+Fair α=0.25/0.5/0.75)
+- ✅ **8 policy configurations tested per branch:**
+  1. **Urgency** (α=1.0, η=0.0) - Pure urgency, no fairness
+  2. **Utility** (α=0.0, η=0.0) - Pure utility, no fairness
+  3. **Hybrid** (α=0.25, η=0.0) - 25% urgency + 75% utility, no fairness
+  4. **Hybrid** (α=0.5, η=0.0) - 50% urgency + 50% utility, no fairness
+  5. **Hybrid** (α=0.75, η=0.0) - 75% urgency + 25% utility, no fairness
+  6. **Hybrid+Fair** (α=0.25, η=1.0) - 25% urgency + 75% utility, with fairness
+  7. **Hybrid+Fair** (α=0.5, η=1.0) - 50% urgency + 50% utility, with fairness
+  8. **Hybrid+Fair** (α=0.75, η=1.0) - 75% urgency + 25% utility, with fairness
 - ✅ **All 3 branches tested** (main, composite-fairness, multidim-fairness)
 - ✅ **3 figure types generated** per branch (urgency vs benefit, fairness vs benefit, summary bars)
 - ✅ Pipeline verified and working across all branches
