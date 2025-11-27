@@ -257,45 +257,25 @@ open main.pdf  # or xdg-open on Linux
 
 ### Parameters
 
-- **α (alpha)**: Urgency/utility weight
-  - α = 1.0: Pure urgency (prioritize sickest)
-  - α = 0.0: Pure utility (maximize benefit)
-  - α = 0.5: Balanced hybrid
-  
-- **η (eta)**: Fairness constraint strength
-  - η = 0.0: No fairness adjustment
-  - η > 0.0: Fairness-aware allocation
-  - η = 1.0: Strong fairness enforcement
-
-- **group_col**: Column for fairness analysis
-  - `Ethnicity`: Default grouping
-  - `SES`: Socioeconomic status
-  - Any column in patient data
+- **α (alpha)**: Urgency/utility weight (1.0=pure urgency, 0.0=pure utility, 0.5=balanced)  
+- **η (eta)**: Fairness strength (0.0=none, 1.0=strong enforcement)  
+- **group_col**: Fairness dimension (`Ethnicity`, `SES`, or any column)
 
 ### Sample Results (Preliminary - Proof of Concept)
 
 **Key Findings:**
-- 🎯 **+29% benefit gain**: Utility vs Urgency (10,391 vs 8,038 years)
-- 🎯 **96% disparity reduction**: With fairness constraints (L1: 0.021 → 0.0008)
-- 🎯 **Only ~8% benefit cost**: For fairness enforcement
-- 🎯 **Multi-dimensional approach best**: 9,535 years (vs 8,960 single-dim, 7,708 composite)
+- **+29% benefit gain**: Utility vs Urgency (10,391 vs 8,038 years)
+- **96% disparity reduction**: With fairness (L1: 0.021 → 0.0008)
+- **~8% benefit cost**: For fairness enforcement
+- **Multi-dimensional approach best**: 9,535 years (vs 8,960 single-dim, 7,708 composite)
 
-**📋 See [`BRANCHES.md`](BRANCHES.md) for complete results tables, detailed explanations, and comparison across all three fairness approaches**
+**📋 See [`BRANCHES.md`](BRANCHES.md) for complete results and detailed explanations**
 
 ### Understanding the Figures
 
-**Figure 1: Urgency vs Benefit Trade-off**
-- Shows Pareto frontier - can't improve both simultaneously
-- Blue dots = no fairness (η=0)
-- Red squares = with fairness (η>0)
-
-**Figure 2: Fairness vs Benefit Trade-off**
-- Shows small benefit cost for large fairness gain
-- Fairness constraints dramatically reduce L1 disparity
-
-**Figure 3: Summary Bars**
-- Side-by-side comparison of all policies
-- Blue = no fairness, Red = with fairness
+**Figure 1: Urgency vs Benefit** - Pareto frontier (can't improve both)  
+**Figure 2: Fairness vs Benefit** - Small benefit cost for large fairness gain  
+**Figure 3: Summary Bars** - Side-by-side policy comparison (Blue=no fairness, Red=with fairness)
 
 ---
 
@@ -308,14 +288,6 @@ open main.pdf  # or xdg-open on Linux
 3. **Run**: All cells in order
 4. **Upload data**: When prompted (or mount Google Drive)
 5. **Download results**: Generated plots and CSV files
-
-### What the Notebook Does
-
-- ✅ Installs dependencies automatically
-- ✅ Writes `policy_baselines.py` inline (standalone)
-- ✅ Runs experiments and parameter sweeps
-- ✅ Generates and displays plots
-- ✅ Saves results for download
 
 **Perfect for**: Team members without local Python setup, quick experiments, sharing results
 
@@ -356,14 +328,10 @@ open main.pdf  # or xdg-open on Linux
 
 | Task | Sample Size | Runtime |
 |------|-------------|---------|
-| SES Addition | 150k patients | 2 sec |
 | Quick Sweep | 5k/1k | 10 sec |
 | Full Sweep | 20k/3k | 45 sec |
 | Large Sweep | 50k/10k | 3 min |
-| Plot Generation | Any | 3 sec |
 | Full Pipeline | 20k/3k | 5 min |
-
-*Tested on: MacBook Pro M1, 16GB RAM*
 
 ---
 
@@ -411,21 +379,11 @@ open main.pdf  # or xdg-open on Linux
 
 ### What's Done ✅
 
-- ✅ Complete code implementation (all 4 policies)
-- ✅ Full automation pipeline
-- ✅ **3 fairness approaches** (single-dimension, composite, weighted multi-dimensional)
-- ✅ LaTeX paper structure with page estimates
-- ✅ Google Colab notebook
-- ✅ Sample results and figures (proof-of-concept with small samples)
-- ✅ Comprehensive documentation
-
-### What's Been Done ✅
-
 | Person | Work Completed |
 |--------|----------------|
 | **Ella** | Generated patient & donor data (~150k patients, ~20k donors) |
 | **Natalie** | Urgency score feature engineering (log dialysis time) |
-| **Kathryn** | Complete code implementation (all 4 policies), automation pipeline, scripts, LaTeX structure, Colab notebook, documentation, GitHub setup, **3 fairness approaches** (single-dimension, composite groups, weighted multi-dimensional), **proof-of-concept tests** on all branches (2k-5k patients to verify everything works) |
+| **Kathryn** | Complete code implementation (all 4 policies), automation pipeline, scripts, LaTeX structure, Colab notebook, documentation, GitHub setup, **3 fairness approaches** (single-dimension, composite groups, weighted multi-dimensional), **proof-of-concept tests** on all branches (5k patients, 1k donors) |
 
 ### What Still Needs To Be Done ⏳
 
@@ -453,30 +411,13 @@ open main.pdf  # or xdg-open on Linux
 
 ## 🆘 Troubleshooting
 
-### Common Issues
+**`ModuleNotFoundError: policy_baselines`** → Set `export PYTHONPATH=$(pwd):$PYTHONPATH`
 
-**Problem**: `ModuleNotFoundError: policy_baselines`
-```bash
-# Solution: Set PYTHONPATH
-export PYTHONPATH=$(pwd):$PYTHONPATH
-```
+**`FileNotFoundError: data/patients.csv`** → Ensure you're in project root and data files exist
 
-**Problem**: `FileNotFoundError: data/patients.csv`
-```bash
-# Make sure you're in project root
-cd kidney-allocation-fairness-
-ls data/  # verify files exist
-```
+**Plots don't show fairness differences** → Verify grouping column has multiple values and η > 0
 
-**Problem**: Plots don't show fairness differences
-- Check that grouping column has multiple values
-- Try increasing sample size
-- Verify η > 0 for fairness-aware runs
-
-**Problem**: LaTeX won't compile
-- Install texlive or use Overleaf
-- Check all figure paths are correct
-- Verify refs.bib has all citations
+**LaTeX won't compile** → Install texlive or use Overleaf; check figure paths and citations
 
 ---
 
@@ -507,26 +448,4 @@ ls data/  # verify files exist
 
 ---
 
-## 🎉 Summary
-
-**This repository provides:**
-- ✅ Complete working implementation of 4 allocation policies
-- ✅ Automated experimentation pipeline
-- ✅ Publication-ready figures and analysis
-- ✅ Complete LaTeX paper structure
-- ✅ Zero-setup Colab option for collaboration
-- ✅ Comprehensive documentation in one place
-
-**Ready to use for:**
-- Running experiments and generating results
-- Writing the paper based on generated outputs
-- Team collaboration via GitHub and Colab
-- Submission as a complete research project
-
 **Get started**: Run `./run_full_pipeline.sh` and focus on writing the paper!
-
----
-
-**Questions?** Open a GitHub issue or contact the team!
-
-**Last updated**: November 27, 2025

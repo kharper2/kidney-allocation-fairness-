@@ -112,109 +112,35 @@ Patient C: White → deficit = -10% (overrepresented)
 
 ## What We Actually Test
 
-In practice, we test these combinations:
+**8 configurations per branch:**
+- 2 baselines: Urgency (α=1.0, η=0), Utility (α=0.0, η=0)
+- 6 Hybrid: Grid search over α ∈ {0.25, 0.5, 0.75} × η ∈ {0.0, 1.0}
 
-### Main Branch Tests:
-1. ✅ Urgency (η=0) - Baseline urgency-only
-2. ✅ Utility (η=0) - Baseline utility-only
-3. ✅ Hybrid (α=0.25, η=0) - Hybrid without fairness
-4. ✅ Hybrid (α=0.50, η=0) - Hybrid without fairness
-5. ✅ Hybrid (α=0.75, η=0) - Hybrid without fairness
-6. ✅ Hybrid+Fair (α=0.25, η=1.0) - Hybrid with Ethnicity fairness
-7. ✅ Hybrid+Fair (α=0.50, η=1.0) - Hybrid with Ethnicity fairness
-8. ✅ Hybrid+Fair (α=0.75, η=1.0) - Hybrid with Ethnicity fairness
-
-**Total: 8 configurations**
-
-### Composite Branch Tests:
-Same 8 configurations, but fairness balances 15 composite groups instead of 5 ethnicity groups.
-
-### Multidim Branch Tests:
-Same 8 configurations, but fairness balances Ethnicity (70%) + SES (30%) simultaneously.
+**Difference across branches:** Fairness constraint balances different groups (5 ethnicity vs 15 composite vs 8 weighted multidim)
 
 ---
 
 ## Why We Focus on Hybrid+Fair
 
-**Most interesting combinations:**
-
-1. **Urgency-only (η=0):** Pure medical urgency - sickest patients first
-   - High urgency scores, but lower total benefit
-   - No fairness consideration
-
-2. **Utility-only (η=0):** Pure efficiency - maximize years gained
-   - Highest total benefit, but lower urgency scores
-   - No fairness consideration
-
-3. **Hybrid (η=0):** Balance urgency and utility
-   - Trade-off between medical need and efficiency
-   - No fairness consideration
-
-4. **Hybrid+Fair (η=1.0):** Balance urgency, utility, AND fairness ⭐
-   - **This is where it gets interesting!**
-   - Can we maintain good medical outcomes while achieving equity?
-   - **Answer: YES!** Only ~6-8% benefit cost for near-perfect fairness
+**Baseline policies (η=0):** Urgency prioritizes sickest, Utility maximizes benefit - no fairness  
+**Hybrid (η=0):** Balances urgency and utility - no fairness  
+**Hybrid+Fair (η=1.0):** ⭐ Balances urgency, utility, AND fairness - **only ~6-8% benefit cost for near-perfect fairness**
 
 ---
 
 ## Key Insight: Fairness is a Modifier
 
-**Think of it this way:**
-
-```
-Base Policy = "What medical criteria matter?"
-- Urgency: Sickness matters most
-- Utility: Survival benefit matters most  
-- Hybrid: Both matter (weighted)
-
-Fairness = "How do we reorder to balance demographics?"
-- Single-dim: Balance one dimension (Ethnicity OR SES)
-- Composite: Balance intersectional groups
-- Multidim: Balance multiple dimensions with weights
-```
-
-**The fairness constraint doesn't change the base policy - it just reorders the queue to ensure demographic balance.**
+**Base Policy** = Medical ranking (urgency, utility, or hybrid)  
+**Fairness** = Reorders queue to balance demographics (single-dim, composite, or multidim)  
+**Result:** Base policy ranks, fairness reorders - doesn't change medical priorities, just ensures demographic balance
 
 ---
 
 ## Example: How Hybrid+Fair Works
 
-**Scenario:** Donor arrives, need to pick recipient
-
-**Step 1: Base Policy (Hybrid, α=0.5)**
-```
-Rank patients by: 0.5 × Urgency + 0.5 × Utility
-
-Top 3 candidates:
-1. Patient A: Urgency=0.8, Utility=0.7 → Score = 0.75 (White, High-SES)
-2. Patient B: Urgency=0.7, Utility=0.8 → Score = 0.75 (Black, Low-SES)  
-3. Patient C: Urgency=0.6, Utility=0.9 → Score = 0.75 (White, Middle-SES)
-```
-
-**Step 2: Fairness Constraint (Single-Dimension, Ethnicity)**
-```
-Current allocations: 70% White, 30% Black (waitlist is 50/50)
-- White deficit: +20% (overrepresented)
-- Black deficit: -20% (underrepresented)
-
-Algorithm: "Prioritize Black patients"
-Result: Pick Patient B (Black) even though tied with others
-```
-
-**Step 3: Fairness Constraint (Multi-Dimensional, 70% Ethnicity + 30% SES)**
-```
-Current allocations: 
-- Ethnicity: 70% White, 30% Black (waitlist 50/50) → White +20%, Black -20%
-- SES: 60% High, 30% Middle, 10% Low (waitlist 40/40/20) → High +20%, Low -10%
-
-Patient A (White, High-SES): 
-  Combined deficit = 0.7×(+20%) + 0.3×(+20%) = +20% (low priority)
-
-Patient B (Black, Low-SES):
-  Combined deficit = 0.7×(-20%) + 0.3×(-10%) = -17% (HIGH priority)
-
-Result: Pick Patient B (underrepresented on BOTH dimensions)
-```
+**Step 1: Base Policy ranks** by 0.5 × Urgency + 0.5 × Utility  
+**Step 2: Fairness reorders** - prioritizes underrepresented groups  
+**Result:** Patient B (Black, Low-SES) selected even if tied with others, because fairness constraint prioritizes underrepresented groups
 
 ---
 
@@ -232,16 +158,11 @@ Result: Pick Patient B (underrepresented on BOTH dimensions)
 
 ## For Your Paper
 
-**Structure your Results section:**
+**Results structure:** Baseline policies → Single-dim fairness → Composite vs Multidim comparison → Optimal: Hybrid (α=0.25-0.5) + Multidim (70/30 weights)
 
-1. **Baseline policies (η=0):** Show urgency vs utility trade-off
-2. **Single-dimension fairness:** Show fairness can be achieved with small cost
-3. **Composite vs Multidim comparison:** Show why flexibility matters
-4. **Optimal configuration:** Hybrid (α=0.25-0.5) + Multidim fairness (70/30 weights)
-
-**Key finding:** Fairness constraint works well with ANY base policy, but multidim approach maintains best efficiency while achieving fairness across multiple dimensions.
+**Key finding:** Fairness works with any base policy; multidim maintains best efficiency while achieving multi-dimensional fairness.
 
 ---
 
-**Bottom line:** The 4 policies determine medical priorities. The 3 fairness approaches determine how to balance demographics. They work together: base policy ranks, fairness reorders. 🎯
+**Bottom line:** 4 policies determine medical priorities. 3 fairness approaches determine demographic balancing. They work together: base policy ranks, fairness reorders. 🎯
 

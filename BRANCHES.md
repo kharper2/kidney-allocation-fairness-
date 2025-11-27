@@ -5,9 +5,7 @@
 
 ---
 
-**All branches tested with 5,000 patients, 1,000 donors (sampled from full 150k/20k dataset)**
-
-⚠️ **CRITICAL:** These are proof-of-concept results. **Final experiments must use 20k-150k patients, 3k-20k donors for the paper.**
+**All branches tested with 5,000 patients, 1,000 donors (proof-of-concept). Final experiments need 20k-150k patients, 3k-20k donors.**
 
 ---
 
@@ -61,13 +59,10 @@ python scripts/run_sweep.py \
 
 ### Why These Results Make Sense
 
-✅ **Excellent single-dimension fairness:** L1=0.0008 means each ethnic group within 0.08% of proportional share
-
-✅ **High efficiency:** 96% organs allocated
-
-✅ **Low fairness cost:** Only 8.5% benefit loss for near-perfect fairness (9,794 → 8,960 years)
-
-⚠️ **Limitation:** Can only balance ONE dimension. If you want fairness across ethnicity AND SES, must run separately and can't optimize both simultaneously.
+✅ **Excellent fairness:** L1=0.0008 (each group within 0.08% of proportional share)  
+✅ **High efficiency:** 96% organs allocated  
+✅ **Low cost:** 8.5% benefit loss for near-perfect fairness  
+⚠️ **Limitation:** Only balances ONE dimension at a time
 
 ### When to Use
 - Simple baseline comparison
@@ -113,31 +108,14 @@ python scripts/run_sweep.py \
 
 ### Composite Groups Created (n=15)
 
-| Group | Count | Percentage |
-|-------|-------|------------|
-| Black_Middle | 26,227 | 17.5% |
-| White_Middle | 29,664 | 19.8% |
-| ... (11 more) | ... | ... |
-| **Other_High** | **527** | **0.4%** ⚠️ |
+Largest: Black_Middle (26,227), White_Middle (29,664)  
+Smallest: Other_High (527 = 0.4%) ⚠️
 
 ### Why These Results Make Sense
 
-✅ **Good intersectional fairness:** L1=0.002 means each of 15 groups balanced
-
-⚠️ **Sparse Group Problem - The Core Issue:**
-1. **15 groups created**, some tiny (Other_High = 527 patients = 0.4% of population)
-2. **Blood Type adds complexity:** 4 donor types × 8 recipient types × 15 groups = **120 possible combinations**
-3. **Many combinations have ZERO patients** (e.g., Type AB + Other_High might have 0-2 patients)
-4. **When fairness activates:**
-   - Algorithm: "Prioritize Other_High group"
-   - Donor: Blood Type AB
-   - Problem: No Type AB patients in Other_High group!
-   - Result: **Kidney goes unused** or very suboptimal match
-
-⚠️ **Significant efficiency loss:**
-- **21% benefit loss** vs non-fairness hybrid (9,794 → 7,708 years)
-- **10% organs wasted** (897/1,000 allocated)
-- **14% worse than single-dimension** which only has 5 ethnicity groups
+✅ **Good intersectional fairness:** L1=0.002 (15 groups balanced)  
+⚠️ **Sparse group problem:** Tiny groups (<1% population) → hard to find compatible matches → organs wasted  
+⚠️ **Efficiency loss:** 21% benefit loss, 10% organs unused (897/1,000), 14% worse than single-dimension
 
 ### When to Use
 - When true intersectionality is theoretically important
@@ -229,43 +207,17 @@ python scripts/run_multidim_sweep.py \
 
 ### Why These Results Make Sense
 
-✅ **Best efficiency - ALL organs allocated!**
-- Tracks 8 groups (5 ethnicities + 3 SES), not 15 intersections
-- Always has large pools in each dimension
-- Always finds compatible matches
-
-✅ **Excellent fairness across BOTH dimensions**
-- L1=0.0008 means balanced on ethnicity AND SES simultaneously
-- Each dimension balanced to within 0.08%
-
-✅ **+24% better than composite** (9,535 vs 7,708 years)
-- Flexibility prevents sparse group problem
-- Can prioritize "Black OR Low-SES" → more options
-
-✅ **+6% better than single-dimension** (9,535 vs 8,960 years)
-- Balances BOTH dimensions simultaneously
-- Single-dim only optimizes one dimension
-
+✅ **Best efficiency:** All 1,000/1,000 organs allocated (tracks 8 groups, not 15 intersections)  
+✅ **Excellent fairness:** L1=0.0008 across BOTH dimensions simultaneously  
+✅ **+24% better than composite** (9,535 vs 7,708 years) - flexibility prevents sparse groups  
+✅ **+6% better than single-dimension** (9,535 vs 8,960 years) - balances both dimensions  
 ✅ **Only 2% fairness cost** (9,744 → 9,535 years)
-- Minimal efficiency loss for multi-dimensional fairness
 
 ### Why Multidim > Composite
 
-**The Key Difference:**
-
-**Composite (Intersectional):**
-- "I need a patient who is BOTH Black AND Low-SES"
-- If no compatible match exists in that specific intersection → organ wasted
-- Like searching for "gluten-free vegan nut-free restaurant within 2 blocks"
-
-**Multidim (Weighted):**
-- "I prefer a patient who is Black (70% weight) OR Low-SES (30% weight)"
-- Flexible combination → always finds reasonable match
-- Like "I want 70% dietary-friendly, 30% close distance" → finds compromise
-
-**Mathematically:**
-- Composite: 15 groups, smallest < 1% → sparse
-- Multidim: 8 groups, smallest ~5-10% → always has matches
+**Composite:** Requires exact intersection match ("Black AND Low-SES") → sparse groups → organs wasted  
+**Multidim:** Flexible weighted combination ("Black OR Low-SES") → always finds matches  
+**Math:** Composite = 15 groups (smallest <1%), Multidim = 8 groups (smallest ~5-10%)
 
 ### When to Use
 - **RECOMMENDED for final paper** ⭐
@@ -278,77 +230,19 @@ python scripts/run_multidim_sweep.py \
 
 ## 🎓 For Your Paper
 
-### Recommended Structure
-
-**1. Methods Section:**
-- Present all three approaches
-- Explain how each works
-- Show pseudo-code for multidim approach
-
-**2. Results Section:**
-- Present multidim as PRIMARY results
-- Include comparison table showing all three
-- Highlight multidim's superiority
-
-**3. Discussion Section:**
-- **Why multidim is better:** Flexibility vs intersectionality trade-off
-- **Policy implications:** Configurable weights let policymakers tune priorities
-- **Scalability:** Can add geography, disability status, age, etc.
-- **Novel contribution:** First comparison of these 3 approaches in organ allocation
-
-### Key Citations to Make
-
-**Intersectionality literature:** Composite approach addresses intersectional fairness concerns
-
-**Multi-objective optimization:** Weighted combination is standard in OR literature
-
-**Kidney allocation:** OPTN moved from urgency-only to utility-based for similar efficiency reasons
-
-### Figures to Include
-
-1. **Comparison bar chart:** All 3 approaches side-by-side (benefit, fairness, efficiency)
-2. **Trade-off curves:** Urgency vs benefit, fairness vs benefit
-3. **Sensitivity analysis:** How multidim results change with different weights
+**Methods:** Present all three approaches, explain how each works  
+**Results:** Present multidim as primary, include comparison table  
+**Discussion:** Flexibility vs intersectionality trade-off, policy implications (configurable weights), scalability  
+**Key citations:** Intersectionality literature, multi-objective optimization, OPTN allocation changes  
+**Figures:** Comparison chart (all 3 approaches), trade-off curves, sensitivity analysis
 
 ---
 
 ## 🚀 Next Steps
 
-**For proof-of-concept (DONE ✅):**
-- [x] Implement all 3 approaches
-- [x] Test with 5k patients, 1k donors
-- [x] Generate results and figures
-- [x] Document everything
-
-**For final paper (TO DO ⚠️):**
-- [ ] Run experiments with 20k-150k patients, 3k-20k donors
-- [ ] Test multiple random seeds for robustness
-- [ ] Run sensitivity analysis on multidim weights
-- [ ] Generate publication-quality figures (300 DPI)
-- [ ] Write up results in LaTeX paper
+**✅ Done:** All 3 approaches implemented and tested (5k patients, 1k donors)  
+**⚠️ To Do:** Run final experiments (20k-150k patients, 3k-20k donors), test multiple seeds, sensitivity analysis, generate final figures
 
 ---
 
-## 📁 Files in Each Branch
-
-### All Branches Have:
-- `policy_baselines.py` - Core allocation algorithms
-- `requirements.txt` - Dependencies
-- `README.md` - Documentation
-- `paper/` - LaTeX paper structure
-- `data/` - Patient and donor CSVs (gitignored)
-- `figures/` - Generated plots
-
-### `composite-fairness` Only:
-- `scripts/add_composite_groups.py` - Creates intersectional groups
-- `COMPOSITE_RESULTS.md` - Detailed results documentation
-
-### `multidim-fairness` Only:
-- `scripts/run_multidim_sweep.py` - Multi-dimensional sweep
-- `scripts/compare_fairness_approaches.py` - Direct comparison tool
-- `MULTIDIM_FAIRNESS.md` - Technical documentation
-- `MULTIDIM_RESULTS.md` - Detailed results documentation
-
----
-
-**Bottom line:** All three work! Use `multidim-fairness` for best results and most interesting paper contribution. 🚀
+**Bottom line:** All three work! Use `multidim-fairness` for best results. 🚀
