@@ -112,6 +112,32 @@ This repository has **3 branches** testing different fairness approaches. All te
 
 ---
 
+## 🔄 How Policies and Fairness Interact
+
+**Two-layer system:**
+
+1. **Base Allocation Policy** (determines medical ranking):
+   - **Urgency-only:** Rank by sickness (sickest first)
+   - **Utility-only:** Rank by survival benefit (highest first)
+   - **Hybrid:** Rank by α × Urgency + (1-α) × Utility
+   - **Hybrid+Fair:** Hybrid + fairness constraint applied
+
+2. **Fairness Approach** (determines demographic balancing):
+   - **Single-dimension:** Balance one dimension (Ethnicity OR SES)
+   - **Composite:** Balance 15 intersectional groups (Black_Low, White_Middle, etc.)
+   - **Multi-dimensional:** Balance multiple dimensions with weights (70% Ethnicity + 30% SES)
+
+**How they combine:**
+- Base policy creates initial ranking (medical priorities)
+- Fairness constraint reorders queue to balance demographics
+- **Example:** Hybrid policy ranks by urgency+utility, then fairness picks best match from underrepresented groups
+
+**What we test:** Hybrid+Fair (α=0.5, η=1.0) with each fairness approach
+
+📋 **See `POLICY_FAIRNESS_INTERACTION.md` for detailed explanation**
+
+---
+
 ### 📌 `main` - Single-Dimension Fairness (Baseline)
 **Status:** ✅ **READY FOR SUBMISSION**
 
