@@ -101,6 +101,7 @@ scripts/
 - Upload or Google Drive options
 
 ### Sample Results (Preliminary - Test Run)
+- ✅ **Grid search over parameters:** α ∈ {0.25, 0.5, 0.75} × η ∈ {0.0, 1.0} = 6 Hybrid configurations
 - ✅ **8 policy configurations tested per branch:**
   1. **Urgency** (α=1.0, η=0.0) - Pure urgency, no fairness
   2. **Utility** (α=0.0, η=0.0) - Pure utility, no fairness
@@ -166,17 +167,20 @@ python scripts/add_ses.py \
   --probs 0.25 0.55 0.20  # Low, Middle, High percentages
 ```
 
-### Running Parameter Sweeps
+### Running Parameter Sweeps (Grid Search)
 
-**Basic sweep:**
+**Performs grid search** over α (urgency/utility weight) and η (fairness strength) parameters.
+
+**Basic sweep (default grid):**
 ```bash
 python scripts/run_sweep.py \
   --patients data/patients.csv \
   --donors data/donors.csv \
   --group_col Ethnicity
 ```
+**Default grid:** α ∈ {0.25, 0.5, 0.75} × η ∈ {0.0, 1.0} = 6 Hybrid configurations + 2 baselines = 8 total
 
-**Custom parameters:**
+**Custom grid search:**
 ```bash
 python scripts/run_sweep.py \
   --patients data/patients_with_ses.csv \
@@ -188,6 +192,7 @@ python scripts/run_sweep.py \
   --group_col SES \
   --seed 42
 ```
+**This grid:** 11 α values × 5 η values = 55 Hybrid configurations + 2 baselines = 57 total
 
 ### Generating Plots
 
