@@ -42,13 +42,7 @@ if [ ! -f "data/donors.csv" ]; then
 fi
 
 echo ""
-echo "Step 1: Adding SES column to patient data..."
-python scripts/add_ses.py \
-  --patients_in data/patients.csv \
-  --patients_out data/patients_with_ses.csv
-
-echo ""
-echo "Step 2: Running parameter sweep (Ethnicity)..."
+echo "Step 1: Running parameter sweep (Ethnicity)..."
 python scripts/run_sweep.py \
   --patients data/patients.csv \
   --donors data/donors.csv \
@@ -58,36 +52,11 @@ python scripts/run_sweep.py \
   --etas 0 1.0 \
   --group_col Ethnicity
 
-# Save Ethnicity results
-mv data/summary.csv data/summary_ethnicity.csv
-echo "Saved: data/summary_ethnicity.csv"
-
 echo ""
-echo "Step 3: Running parameter sweep (SES)..."
-python scripts/run_sweep.py \
-  --patients data/patients_with_ses.csv \
-  --donors data/donors.csv \
-  --sample_patients 20000 \
-  --sample_donors 3000 \
-  --alphas 0.25 0.5 0.75 \
-  --etas 0 0.5 1.0 \
-  --group_col SES
-
-# Save SES results
-mv data/summary.csv data/summary_ses.csv
-echo "Saved: data/summary_ses.csv"
-
-echo ""
-echo "Step 4: Generating plots for Ethnicity..."
+echo "Step 2: Generating plots..."
 python scripts/generate_plots.py \
-  --summary data/summary_ethnicity.csv \
-  --outdir figures/ethnicity
-
-echo ""
-echo "Step 5: Generating plots for SES..."
-python scripts/generate_plots.py \
-  --summary data/summary_ses.csv \
-  --outdir figures/ses
+  --summary data/summary.csv \
+  --outdir figures
 
 echo ""
 echo "======================================"
@@ -95,10 +64,8 @@ echo "Pipeline complete!"
 echo "======================================"
 echo ""
 echo "Results:"
-echo "  - data/summary_ethnicity.csv"
-echo "  - data/summary_ses.csv"
-echo "  - figures/ethnicity/*.png"
-echo "  - figures/ses/*.png"
+echo "  - data/summary.csv"
+echo "  - figures/*.png"
 echo ""
 echo "Next steps:"
 echo "  1. Review plots in figures/ directories"
