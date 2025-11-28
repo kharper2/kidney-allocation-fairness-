@@ -44,8 +44,8 @@ fairness_eta > 0.0 → Apply fairness constraint (reorder to balance groups)
 ```
 
 **The fairness constraint implementation differs across branches:**
-- **Main branch:** Balance one dimension (Ethnicity OR SES)
-- **Composite branch:** Balance 15 intersectional groups
+- **Main branch:** Balance one dimension (Ethnicity, DistancetoCenterMiles, or Sex - SRTR data)
+- **Composite branch:** Balance 25 intersectional groups (Ethnicity × Distance)
 - **Multidim branch:** Balance multiple dimensions with weights
 
 ---
@@ -95,15 +95,15 @@ Patient C: White → deficit = -10% (overrepresented)
 | **Hybrid (α=0.5)** | Rank by 50% urgency + 50% utility | Hybrid ranking + balance 15 composite groups |
 | **Hybrid+Fair** | Same as Hybrid | Same as Hybrid (η=1.0) |
 
-**Difference:** Fairness constraint balances across 15 intersectional groups (Black_Low, White_Middle, etc.) instead of 5 ethnicity groups.
+**Difference:** Fairness constraint balances across 25 intersectional groups (Black_<50, White_>250, etc.) instead of 5 ethnicity groups.
 
 ### Multidim Branch (Weighted Multi-Dimensional)
 
 | Base Policy | Fairness η=0 | Fairness η=1.0 |
 |-------------|--------------|-----------------|
-| **Urgency** | Rank by urgency only | Urgency ranking + balance Ethnicity (70%) + SES (30%) |
-| **Utility** | Rank by utility only | Utility ranking + balance Ethnicity (70%) + SES (30%) |
-| **Hybrid (α=0.5)** | Rank by 50% urgency + 50% utility | Hybrid ranking + balance Ethnicity (70%) + SES (30%) |
+| **Urgency** | Rank by urgency only | Urgency ranking + balance Ethnicity (70%) + Distance (30%) |
+| **Utility** | Rank by utility only | Utility ranking + balance Ethnicity (70%) + Distance (30%) |
+| **Hybrid (α=0.5)** | Rank by 50% urgency + 50% utility | Hybrid ranking + balance Ethnicity (70%) + Distance (30%) |
 | **Hybrid+Fair** | Same as Hybrid | Same as Hybrid (η=1.0) |
 
 **Difference:** Fairness constraint balances across BOTH dimensions simultaneously with configurable weights.
@@ -112,11 +112,11 @@ Patient C: White → deficit = -10% (overrepresented)
 
 ## What We Actually Test
 
-**8 configurations per branch:**
-- 2 baselines: Urgency (α=1.0, η=0), Utility (α=0.0, η=0)
+**9 configurations per branch:**
+- 3 baselines: Urgency (α=1.0, η=0), Wait-Time (α=1.0, η=0), Utility (α=0.0, η=0)
 - 6 Hybrid: Grid search over α ∈ {0.25, 0.5, 0.75} × η ∈ {0.0, 1.0}
 
-**Difference across branches:** Fairness constraint balances different groups (5 ethnicity vs 15 composite vs 8 weighted multidim)
+**Difference across branches:** Fairness constraint balances different groups (5 ethnicity vs 25 composite vs 10 independent groups for multidim)
 
 ---
 
@@ -140,7 +140,7 @@ Patient C: White → deficit = -10% (overrepresented)
 
 **Step 1: Base Policy ranks** by 0.5 × Urgency + 0.5 × Utility  
 **Step 2: Fairness reorders** - prioritizes underrepresented groups  
-**Result:** Patient B (Black, Low-SES) selected even if tied with others, because fairness constraint prioritizes underrepresented groups
+**Result:** Patient B (Black, >250 miles) selected even if tied with others, because fairness constraint prioritizes underrepresented groups
 
 ---
 
@@ -151,18 +151,16 @@ Patient C: White → deficit = -10% (overrepresented)
 | Urgency | Single-dim | 5 ethnicity groups | High urgency, low benefit |
 | Utility | Single-dim | 5 ethnicity groups | High benefit, low urgency |
 | Hybrid | Single-dim | 5 ethnicity groups | Balanced, good fairness |
-| Hybrid | Composite | 15 intersectional groups | Good fairness, lower benefit (sparse groups) |
-| Hybrid | Multidim | 5 ethnicities + 3 SES (weighted) | **BEST: Good fairness + high benefit** ⭐ |
+| Hybrid | Composite | 25 intersectional groups | Lower benefit (sparse groups, 25% organs wasted) |
+| Hybrid | Multidim | 5 ethnicities + 5 distance categories (weighted) | **Excellent: Good fairness + high benefit** ⭐ |
 
 ---
 
-## For Your Paper
+## Summary
 
-**Results structure:** Baseline policies → Single-dim fairness → Composite vs Multidim comparison → Optimal: Hybrid (α=0.25-0.5) + Multidim (70/30 weights)
+**4 policies** determine medical priorities (urgency, utility, hybrid, or wait-time).  
+**3 fairness approaches** determine demographic balancing (single-dim, composite, multidim).  
+**They work together:** Base policy ranks patients, fairness reorders to balance groups.
 
-**Key finding:** Fairness works with any base policy; multidim maintains best efficiency while achieving multi-dimensional fairness.
-
----
-
-**Bottom line:** 4 policies determine medical priorities. 3 fairness approaches determine demographic balancing. They work together: base policy ranks, fairness reorders. 🎯
+**Tested results:** Single-dimension (Sex) performs best (9,512 years), multidim balances multiple dimensions well (9,501 years), composite struggles with sparse groups (6,479 years).
 

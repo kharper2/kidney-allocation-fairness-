@@ -66,14 +66,15 @@ python scripts/analyze_results.py
 ## 📦 What's Included
 
 ### Core Implementation
-✅ **4 Allocation Policies**
-- **Urgency-only**: Prioritize sickest patients
+✅ **5 Allocation Policies**
+- **Urgency-only**: Prioritize sickest patients (uses dialysis time + diabetes)
+- **Wait-Time-only**: Naive baseline using wait time only (for comparison)
 - **Utility-only**: Maximize survival benefit
-- **Hybrid**: Weighted combination (α parameter)
-- **Fairness-constrained**: Dynamic group balancing (η parameter)
+- **Hybrid**: Weighted combination of urgency + utility (α parameter)
+- **Hybrid+Fair**: Hybrid with fairness constraint (η parameter)
 
 ✅ **Features**
-- Flexible grouping (Ethnicity, SES, or any column)
+- Flexible grouping (Ethnicity, DistancetoCenterMiles, Sex - SRTR data)
 - ABO blood type compatibility
 - KDPI-based donor quality stratification
 - Complete reproducibility (fixed seeds)
@@ -81,7 +82,6 @@ python scripts/analyze_results.py
 ### Tools & Scripts
 ```
 scripts/
-├── add_ses.py           # Add socioeconomic status (25/55/20 split)
 ├── run_sweep.py         # Parameter sweeps over α and η
 ├── generate_plots.py    # Publication-quality figures (300 DPI)
 └── analyze_results.py   # Summary statistics + LaTeX tables
@@ -100,23 +100,16 @@ scripts/
 - No local Python installation required
 - Upload or Google Drive options
 
-### Sample Results (Preliminary - Test Run)
-- ✅ **8 policy configurations tested per branch:**
-  - **2 Baseline policies** (not part of grid):
-    1. **Urgency** (α=1.0, η=0.0) - Pure urgency, no fairness
-    2. **Utility** (α=0.0, η=0.0) - Pure utility, no fairness
-  - **6 Hybrid configurations from grid search** (α × η combinations):
-    3. **Hybrid** (α=0.25, η=0.0) - 25% urgency + 75% utility, no fairness
-    4. **Hybrid** (α=0.5, η=0.0) - 50% urgency + 50% utility, no fairness
-    5. **Hybrid** (α=0.75, η=0.0) - 75% urgency + 25% utility, no fairness
-    6. **Hybrid+Fair** (α=0.25, η=1.0) - 25% urgency + 75% utility, with fairness
-    7. **Hybrid+Fair** (α=0.5, η=1.0) - 50% urgency + 50% utility, with fairness
-    8. **Hybrid+Fair** (α=0.75, η=1.0) - 75% urgency + 25% utility, with fairness
-  
-  **Grid search:** Tests all combinations of α ∈ {0.25, 0.5, 0.75} × η ∈ {0.0, 1.0} for Hybrid policies only
-- ✅ **All 3 branches tested** (main, composite-fairness, multidim-fairness)
-- ✅ **3 figure types generated** per branch (urgency vs benefit, fairness vs benefit, summary bars)
-- ✅ Pipeline verified and working across all branches
+### Test Results (Proof of Concept - 5k patients, 1k donors)
+
+**9 policy configurations tested per branch:**
+- **3 Baseline policies:** Urgency, Wait-Time, Utility
+- **6 Hybrid policies:** Grid search over α ∈ {0.25, 0.5, 0.75} × η ∈ {0.0, 1.0}
+
+**All 3 branches tested and verified:**
+- ✅ Main branch (single-dimension)
+- ✅ Composite-fairness branch (intersectional groups)
+- ✅ Multidim-fairness branch (weighted multi-dimensional)
 
 ---
 
@@ -128,9 +121,9 @@ This repository has **3 branches** testing different fairness approaches.
 
 | Branch | Approach | Status | Best Result |
 |--------|----------|--------|-------------|
-| **`main`** | Single-dimension (Ethnicity OR SES) | ✅ Tested | 8,960 years, L1=0.0008 |
-| **`composite-fairness`** | Intersectional groups (15 groups) | ✅ Tested | 7,708 years, L1=0.002 |
-| **`multidim-fairness`** ⭐ | Weighted multi-dimensional | ✅ Tested | **9,535 years, L1=0.0008** |
+| **`main`** | Single-dimension (Ethnicity, Distance, or Sex) | ✅ Tested | 9,512 years (Sex), 9,125 years (Distance), 8,960 years (Ethnicity) |
+| **`multidim-fairness`** ⭐ | Weighted multi-dimensional (Ethnicity + Distance) | ✅ Tested | **9,501 years, L1=0.0015** |
+| **`composite-fairness`** | Intersectional groups (Ethnicity × Distance) | ✅ Tested | 6,479 years, L1=0.0043 (sparse groups) |
 
 **📋 See [`BRANCHES.md`](BRANCHES.md) for detailed descriptions, usage instructions, and full results**
 
@@ -150,7 +143,6 @@ kidney-allocation-fairness-/
 ├── data/
 │   ├── patients.csv             # 150k synthetic patients
 │   ├── donors.csv               # 20k synthetic donors
-│   ├── patients_with_ses.csv   # With SES column (generated)
 │   └── summary.csv              # Results (generated)
 ├── figures/                      # Generated plots
 │   ├── tradeoff_urgency_vs_benefit.png
@@ -161,14 +153,14 @@ kidney-allocation-fairness-/
 └── paper/                        # LaTeX paper
 ```
 
-### Adding SES Column
+### Fairness Dimensions (SRTR Data)
 
-```bash
-python scripts/add_ses.py \
-  --patients_in data/patients.csv \
-  --patients_out data/patients_with_ses.csv \
-  --probs 0.25 0.55 0.20  # Low, Middle, High percentages
-```
+**Available columns in `patients.csv` for fairness:**
+- **`Ethnicity`** - Hispanic, Black, White, Asian, Other
+- **`DistancetoCenterMiles`** - Distance to treatment center (<50, 50-100, 100-150, 150-250, >250 miles) - **SRTR accessibility measure**
+- **`Sex`** - M, F
+
+**Note:** We use only SRTR data fields. Distance to treatment center is a key accessibility measure used in transplant allocation.
 
 ### Running Parameter Sweeps (Grid Search)
 
@@ -184,18 +176,18 @@ python scripts/run_sweep.py \
   --group_col Ethnicity
 ```
 **Default grid for Hybrid:** α ∈ {0.25, 0.5, 0.75} × η ∈ {0.0, 1.0} = **6 Hybrid configurations**  
-**Plus 2 baselines** = **8 total configurations**
+**Plus 3 baselines** (Urgency, Wait-Time, Utility) = **9 total configurations**
 
 **Custom grid search (finer grid):**
 ```bash
 python scripts/run_sweep.py \
-  --patients data/patients_with_ses.csv \
+  --patients data/patients.csv \
   --donors data/donors.csv \
   --sample_patients 50000 \
   --sample_donors 10000 \
   --alphas 0.0 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.0 \
   --etas 0 0.25 0.5 0.75 1.0 \
-  --group_col SES \
+  --group_col DistancetoCenterMiles \
   --seed 42
 ```
 **This grid for Hybrid:** 11 α values × 5 η values = **55 Hybrid configurations**  
@@ -259,15 +251,25 @@ open main.pdf  # or xdg-open on Linux
 
 - **α (alpha)**: Urgency/utility weight (1.0=pure urgency, 0.0=pure utility, 0.5=balanced)  
 - **η (eta)**: Fairness strength (0.0=none, 1.0=strong enforcement)  
-- **group_col**: Fairness dimension (`Ethnicity`, `SES`, or any column)
+- **group_col**: Fairness dimension (`Ethnicity`, `DistancetoCenterMiles`, `Sex` - SRTR data)
 
 ### Sample Results (Preliminary - Proof of Concept)
 
+**Verified Results (5k patients, 1k donors):**
+
+| Approach | Best Result | Why It Works |
+|----------|-------------|--------------|
+| **Main (Sex)** | 9,512 years, L1=0.0003 | 2 groups easy to balance, high efficiency (99% organs used) |
+| **Multidim (Ethnicity+Distance)** | 9,501 years, L1=0.0015 | Tracks 10 groups independently, avoids sparse group problem |
+| **Main (Distance)** | 9,125 years, L1=0.0010 | SRTR accessibility measure, 5 distance categories |
+| **Main (Ethnicity)** | 8,960 years, L1=0.0008 | Standard approach, 5 groups, 96% organs used |
+| **Composite (Ethnicity×Distance)** | 6,479 years, L1=0.0043 | 25 intersectional groups too sparse, 25% organs wasted |
+
 **Key Findings:**
-- **+29% benefit gain**: Utility vs Urgency (10,391 vs 8,038 years)
-- **96% disparity reduction**: With fairness (L1: 0.021 → 0.0008)
-- **~8% benefit cost**: For fairness enforcement
-- **Multi-dimensional approach best**: 9,535 years (vs 8,960 single-dim, 7,708 composite)
+- **Utility beats Urgency**: 10,391 vs 8,038 years (+29%) - healthy recipients gain more years
+- **Fairness works well**: L1 drops from 0.021 to 0.0003-0.0015 with only 3-8% benefit cost
+- **Sex fairness best**: 2 groups easier to balance than 5 (9,512 vs 8,960 years)
+- **Multidim beats Composite**: 9,501 vs 6,479 years - flexible tracking avoids sparse groups
 
 **📋 See [`BRANCHES.md`](BRANCHES.md) for complete results and detailed explanations**
 
@@ -312,7 +314,6 @@ open main.pdf  # or xdg-open on Linux
 
 **All tests passed:**
 - ✓ policy_baselines imports successfully
-- ✓ add_ses.py works
 - ✓ run_sweep.py works
 - ✓ generate_plots.py works
 - ✓ analyze_results.py works
@@ -321,8 +322,7 @@ open main.pdf  # or xdg-open on Linux
 **Data validation:**
 - ✓ patients.csv: 150,002 rows
 - ✓ donors.csv: 20,002 rows
-- ✓ SES distribution: 25% Low, 55% Middle, 20% High
-- ✓ 8 configurations tested successfully
+- ✓ 9 configurations tested successfully (3 baselines + 6 Hybrid)
 
 ### Performance Benchmarks
 

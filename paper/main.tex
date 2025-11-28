@@ -95,7 +95,7 @@ S^{\mathrm{no}}_{i} = \gamma_0 - \gamma_1 \mathrm{DialysisYears}_i - \gamma_2 \m
 \noindent \textbf{Urgency-only.} Among ABO-compatible candidates, allocate to maximal normalized $\mathrm{Urgency}_i$. \\
 \textbf{Utility-only.} Allocate to maximal $B_{i,d}$. \\
 \textbf{Hybrid.} $H_{i,d}=\lambda \,\widehat{\mathrm{Urgency}}_i + (1-\lambda)\,\widehat{B}_{i,d}$, $\lambda\in[0,1]$ (grid search). \\
-\textbf{Fairness-constrained hybrid.} Let $g(i)$ be the candidate group (e.g., Ethnicity/SES). With $p_g$ the group’s waitlist share and $a_g(t)$ its allocation share so far at step $t$,
+\textbf{Fairness-constrained hybrid.} Let $g(i)$ be the candidate group (e.g., Ethnicity, Distance to Treatment Center, or Sex). With $p_g$ the group's waitlist share and $a_g(t)$ its allocation share so far at step $t$,
 \begin{equation}
 H^\mathrm{fair}_{i,d}(t) = H_{i,d} + \eta \left(p_{g(i)} - a_{g(i)}(t)\right).
 \end{equation}
