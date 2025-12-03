@@ -124,7 +124,7 @@ H^\mathrm{fair}_{i,d}(t) = H_{i,d} + \eta \left(p_{g(i)} - a_{g(i)}(t)\right).
 \noindent We interpret policy trade-offs, highlight situations where urgency/utility/fairness weighting differs by institutional priorities, and discuss robustness/sensitivity observations.
 
 \section{Limitations and Ethical Considerations (0.5 page)}
-\noindent Synthetic data and simplified survival assumptions; omitted clinical factors; risk of bias when using group-aware adjustments; non-deployability without rigorous validation.
+\noindent Synthetic data and simplified survival assumptions; omitted clinical factors (notably CPRA, which measures donor-recipient antibody incompatibility and grants national priority to highly sensitized patients in practice); risk of bias when using group-aware adjustments; non-deployability without rigorous validation. We enforce ABO blood type compatibility (O donors $\rightarrow$ all types; A $\rightarrow$ A/AB; B $\rightarrow$ B/AB; AB $\rightarrow$ AB only) but focus on policy effects rather than achieving clinical precision, which would require CPRA modeling.
 
 \section{Team Contributions and Graduate Credit (1 page)}
 \noindent Outline individual responsibilities (data generation; policy design and implementation; fairness mechanism; evaluation suite; literature review; ML survival surrogate; weight optimization). Graduate credit components include the fairness-aware online allocation algorithm, sensitivity/stress-test suite, and reproducible software artifacts.
