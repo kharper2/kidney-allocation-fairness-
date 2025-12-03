@@ -47,7 +47,7 @@ def main():
 
     handle_fair = mlines.Line2D([], [], 
                                 color='red', marker='s', linestyle='None',
-                                markersize=8, label='η>0 (fairness-aware)')
+                                markersize=8, label='η=1 (fairness-aware)')
 
     plt.legend(handles=[handle_no_fair, handle_fair], loc='best')
     plt.tight_layout()
@@ -83,7 +83,7 @@ def main():
 
     handle_fair = mlines.Line2D([], [], 
                                 color='red', marker='s', linestyle='None',
-                                markersize=8, label='η>0 (fairness-aware)')
+                                markersize=8, label='η=1 (fairness-aware)')
 
     plt.legend(handles=[handle_no_fair, handle_fair], loc='best')
     # plt.legend(['η=0 (no fairness)', 'η>0 (fairness-aware)'], loc='best')
@@ -147,7 +147,7 @@ def main():
 
     # Create legend handles
     blue_patch = mpatches.Patch(color='blue', label='η=0 (no fairness)')
-    red_patch = mpatches.Patch(color='red', label='η>0 (fairness-aware)')
+    red_patch = mpatches.Patch(color='red', label='η=1 (fairness-aware)')
 
     # Legends
     ax1.legend(handles=[blue_patch, red_patch], loc='center right', fontsize=10)
