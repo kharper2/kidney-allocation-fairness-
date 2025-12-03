@@ -6,6 +6,9 @@ import argparse
 import pandas as pd
 import matplotlib.pyplot as plt
 import os
+import matplotlib.lines as mlines
+import matplotlib.patches as mpatches
+
 
 def main():
     ap = argparse.ArgumentParser()
@@ -36,7 +39,17 @@ def main():
     plt.ylabel('Total Survival Benefit (years)', fontsize=12)
     plt.title('Trade-off: Urgency vs Total Benefit', fontsize=14, fontweight='bold')
     plt.grid(True, alpha=0.3)
-    plt.legend(['η=0 (no fairness)', 'η>0 (fairness-aware)'], loc='best')
+
+    # Legend handles that match your plot markers
+    handle_no_fair = mlines.Line2D([], [], 
+                                color='blue', marker='o', linestyle='None',
+                                markersize=8, label='η=0 (no fairness)')
+
+    handle_fair = mlines.Line2D([], [], 
+                                color='red', marker='s', linestyle='None',
+                                markersize=8, label='η>0 (fairness-aware)')
+
+    plt.legend(handles=[handle_no_fair, handle_fair], loc='best')
     plt.tight_layout()
     outpath = os.path.join(args.outdir, 'tradeoff_urgency_vs_benefit.png')
     plt.savefig(outpath, dpi=300, bbox_inches='tight')
@@ -63,7 +76,17 @@ def main():
     plt.ylabel('Total Survival Benefit (years)', fontsize=12)
     plt.title('Trade-off: Fairness vs Total Benefit', fontsize=14, fontweight='bold')
     plt.grid(True, alpha=0.3)
-    plt.legend(['η=0 (no fairness)', 'η>0 (fairness-aware)'], loc='best')
+    # Legend handles that match your plot markers
+    handle_no_fair = mlines.Line2D([], [], 
+                                color='blue', marker='o', linestyle='None',
+                                markersize=8, label='η=0 (no fairness)')
+
+    handle_fair = mlines.Line2D([], [], 
+                                color='red', marker='s', linestyle='None',
+                                markersize=8, label='η>0 (fairness-aware)')
+
+    plt.legend(handles=[handle_no_fair, handle_fair], loc='best')
+    # plt.legend(['η=0 (no fairness)', 'η>0 (fairness-aware)'], loc='best')
     plt.tight_layout()
     outpath = os.path.join(args.outdir, 'tradeoff_fairness_vs_benefit.png')
     plt.savefig(outpath, dpi=300, bbox_inches='tight')
@@ -94,6 +117,10 @@ def main():
     ax2.grid(True, alpha=0.3, axis='y')
     
     plt.tight_layout()
+    blue_patch = mpatches.Patch(color='blue', label='η=0 (no fairness)')
+    red_patch = mpatches.Patch(color='red', label='η>0 (fairness-aware)')
+
+    fig.legend(handles=[blue_patch, red_patch], loc='upper center', ncol=2)
     outpath = os.path.join(args.outdir, 'summary_bars.png')
     plt.savefig(outpath, dpi=300, bbox_inches='tight')
     print(f"Saved {outpath}")
