@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 """
 Create composite groups for multi-dimensional fairness analysis.
-Combines multiple protected attributes (e.g., Ethnicity + SES) into single group labels.
+Combines multiple protected attributes (e.g., Ethnicity + Distance) into single group labels.
 
 Extension: Multi-Dimensional Fairness
 """
@@ -11,10 +11,10 @@ import pandas as pd
 
 def main():
     ap = argparse.ArgumentParser(description='Create composite fairness groups')
-    ap.add_argument('--patients_in', required=True, help='Input patients CSV (must have SES column)')
+    ap.add_argument('--patients_in', required=True, help='Input patients CSV')
     ap.add_argument('--patients_out', required=True, help='Output patients CSV with composite groups')
-    ap.add_argument('--columns', nargs='+', default=['Ethnicity', 'SES'], 
-                    help='Columns to combine (default: Ethnicity SES)')
+    ap.add_argument('--columns', nargs='+', default=['Ethnicity', 'DistancetoCenterMiles'], 
+                    help='Columns to combine (default: Ethnicity DistancetoCenterMiles)')
     ap.add_argument('--separator', default='_', help='Separator for composite labels (default: _)')
     args = ap.parse_args()
     

@@ -4,21 +4,21 @@
 **Status:** Optional extension - READY TO USE  
 **Main branch:** Safe and ready for submission
 
-**What this does:** Combines multiple attributes (Ethnicity + SES) into composite group labels to enable intersectional fairness.
+**What this does:** Combines multiple attributes (Ethnicity + Distance) into composite group labels to enable intersectional fairness.
 
 ---
 
 ## What This Extension Adds
 
-**Multi-dimensional fairness constraints** that balance across multiple protected attributes simultaneously (e.g., Ethnicity AND Sex, or Ethnicity AND SES together).
+**Multi-dimensional fairness constraints** that balance across multiple protected attributes simultaneously (e.g., Ethnicity AND Sex, or Ethnicity AND Distance together).
 
 ### Current Implementation (Main Branch)
-- Single dimension fairness: balance by Ethnicity OR SES OR Sex (one at a time)
+- Single dimension fairness: balance by Ethnicity OR Distance OR Sex (one at a time)
 - Specify via `group_col='Ethnicity'`
 
 ### This Extension (Composite Branch)
 - Composite group fairness: balance by intersectional group combinations
-- Example: Balance across combinations like "Black_Low", "White_Middle", etc.
+- Example: Balance across combinations like "Black_<50", "White_>250", etc.
 - Treats each combination as a distinct group (intersectionality)
 
 ---
@@ -30,10 +30,10 @@ Create combined group labels before running:
 
 ```python
 # In preprocessing script
-df['Ethnicity_SES'] = df['Ethnicity'] + '_' + df['SES']
+df['Ethnicity_Distance'] = df['Ethnicity'] + '_' + df['DistancetoCenterMiles'].astype(str)
 
 # Then run allocation
-allocate(..., group_col='Ethnicity_SES', fairness_eta=1.0)
+allocate(..., group_col='Ethnicity_Distance', fairness_eta=1.0)
 ```
 
 **Pros:**
@@ -50,18 +50,18 @@ allocate(..., group_col='Ethnicity_SES', fairness_eta=1.0)
 # scripts/add_composite_groups.py
 import pandas as pd
 
-df = pd.read_csv('data/patients_with_ses.csv')
-df['Ethnicity_SES'] = df['Ethnicity'] + '_' + df['SES']
-df.to_csv('data/patients_multidim.csv', index=False)
+df = pd.read_csv('data/patients.csv')
+df['Ethnicity_Distance'] = df['Ethnicity'] + '_' + df['DistancetoCenterMiles'].astype(str)
+df.to_csv('data/patients_composite.csv', index=False)
 ```
 
 2. Run with composite group:
 
 ```bash
 python scripts/run_sweep.py \
-  --patients data/patients_multidim.csv \
+  --patients data/patients_composite.csv \
   --donors data/donors.csv \
-  --group_col Ethnicity_SES
+  --group_col Ethnicity_DistancetoCenterMiles
 ```
 
 3. Compare single-dim vs multi-dim results
@@ -71,10 +71,10 @@ python scripts/run_sweep.py \
 ## What to Include in Paper
 
 ### Methods Section (Add paragraph)
-> "As an extension, we also implemented multi-dimensional fairness by constructing composite groups (e.g., 'Black_Low', 'White_Middle') that represent combinations of ethnicity and socioeconomic status. This allows the fairness mechanism to balance across intersectional identities."
+> "As an extension, we also implemented multi-dimensional fairness by constructing composite groups (e.g., 'Black_<50', 'White_>250') that represent combinations of ethnicity and distance to treatment center. This allows the fairness mechanism to balance across intersectional identities."
 
 ### Results Section (Add subsection)
-> "Multi-dimensional fairness results: When balancing across Ethnicity×SES combinations, we observed [findings]. Compared to single-dimension fairness, multi-dimensional constraints [trade-offs]."
+> "Multi-dimensional fairness results: When balancing across Ethnicity×Distance combinations, we observed [findings]. Compared to single-dimension fairness, multi-dimensional constraints [trade-offs]."
 
 ### Team Contributions
 > "Extension: Multi-dimensional fairness mechanism implementation and analysis (Kathryn/whoever does this)"
@@ -113,9 +113,9 @@ python scripts/add_composite_groups.py
 
 # Run experiments
 python scripts/run_sweep.py \
-  --patients data/patients_multidim.csv \
+  --patients data/patients_composite.csv \
   --donors data/donors.csv \
-  --group_col Ethnicity_SES \
+  --group_col Ethnicity_DistancetoCenterMiles \
   --alphas 0.5 \
   --etas 0 1.0
 

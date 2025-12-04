@@ -3,7 +3,7 @@
 **Branch:** `composite-fairness`  
 **Date:** November 27, 2024  
 **Test Configuration:** 5,000 patients, 1,000 donors (sampled from full dataset)  
-**Fairness Approach:** Composite groups (Ethnicity × SES = 15 groups)  
+**Fairness Approach:** Composite groups (Ethnicity × Distance = 25 groups)  
 **Random Seed:** 42
 
 ---
@@ -25,7 +25,7 @@
 
 ## Composite Groups Created
 
-15 intersectional groups (Ethnicity × SES):
+25 intersectional groups (Ethnicity × Distance):
 
 | Group | Count | Percentage |
 |-------|-------|------------|
@@ -78,16 +78,16 @@
 4. Result: **Kidney goes unused** or algorithm forced to pick very suboptimal match
 
 ### Mathematical Issue
-- 15 groups → average 6.7% per group
+- 25 groups → average 4% per group
 - Smallest groups < 0.5% of population
-- With blood type constraint (8 types × 15 groups = 120 possible combinations!)
+- With blood type constraint (4 types × 25 groups = 100 possible combinations!)
 - Many combinations have **zero or very few patients**
 
 ---
 
 ## Comparison to Multi-Dimensional Approach
 
-The multi-dimensional approach tracks 5 ethnicities + 3 SES = 8 groups (not 15) and combines deficits with weights. This avoids the sparse group problem while still achieving fairness across both dimensions.
+The multi-dimensional approach tracks 5 ethnicities + 5 distance categories = 10 groups (not 25) and combines deficits with weights. This avoids the sparse group problem while still achieving fairness across both dimensions.
 
 **Expected next:** Run multi-dimensional branch for direct comparison.
 
