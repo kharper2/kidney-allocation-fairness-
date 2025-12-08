@@ -3,6 +3,16 @@ import numpy as np
 import pandas as pd
 from collections import Counter
 
+# Optional ML imports
+try:
+    from ml_models import PostTxSurvivalPredictor, NoTxSurvivalPredictor, load_trained_models
+    ML_AVAILABLE = True
+except ImportError:
+    ML_AVAILABLE = False
+    PostTxSurvivalPredictor = None
+    NoTxSurvivalPredictor = None
+    load_trained_models = None
+
 ABO_RECIPIENTS = {
     'O': ['O', 'A', 'B', 'AB'],
     'A': ['A', 'AB'],
@@ -10,15 +20,35 @@ ABO_RECIPIENTS = {
     'AB': ['AB']
 }
 
-def compute_patient_features(df: pd.DataFrame):
+def compute_patient_features(df: pd.DataFrame, use_ml=False, no_tx_model=None):
+    """
+    Compute patient features for allocation.
+    
+    Args:
+        df: DataFrame with patient data
+        use_ml: If True, use ML model for NoTx prediction (requires no_tx_model)
+        no_tx_model: Trained NoTxSurvivalPredictor (required if use_ml=True)
+    
+    Returns:
+        DataFrame with computed features
+    """
     out = df.copy()
     out['EPTS_norm'] = out['EPTSScore'].clip(0,100) / 100.0
     out['Age80'] = np.minimum(out['Age'], 80.0) / 80.0
     urg_raw = np.log1p(out['DialysisYears'].clip(lower=0.0)) + 0.3 * out['Diabetes'].astype(float)
     umin, umax = urg_raw.min(), urg_raw.max()
     out['Urgency_norm'] = (urg_raw - umin) / (umax - umin + 1e-9)
-    no_tx = 5.0 - 0.6 * out['DialysisYears'] - 1.0 * out['Diabetes'].astype(float) - 0.5 * out['Age80']
-    out['NoTx'] = np.maximum(0.0, no_tx)
+    
+    # NoTx survival: use ML model or fixed formula
+    if use_ml and no_tx_model is not None:
+        if not ML_AVAILABLE:
+            raise ImportError("ML models not available. Install scikit-learn and ensure ml_models.py exists.")
+        out['NoTx'] = np.maximum(0.0, no_tx_model.predict_survival(out))
+    else:
+        # Fixed formula (original)
+        no_tx = 5.0 - 0.6 * out['DialysisYears'] - 1.0 * out['Diabetes'].astype(float) - 0.5 * out['Age80']
+        out['NoTx'] = np.maximum(0.0, no_tx)
+    
     E = out['EPTS_norm'].values
     Age80 = out['Age80'].values
     out['A_part'] = 6.0 * (1.0 - E) + 1.0 * (1.0 - Age80) - out['NoTx'].values
@@ -56,15 +86,43 @@ def build_sorted_lists(pat_df: pd.DataFrame, policy: str, alpha: float = 0.5, n_
             lists[abo][b] = idxs[order].tolist()
     return lists
 
-def exact_utility_for_pair(pat_df_row, kdpi_norm):
-    E = float(pat_df_row['EPTS_norm']); K = float(kdpi_norm); Age80 = float(pat_df_row['Age80'])
-    theta0,theta1,theta2,theta3,theta4 = 5.0, 6.0, 3.0, 1.0, 2.0
-    post = theta0 + theta1*(1.0-E) + theta2*(1.0-K) + theta3*(1.0-Age80) + theta4*(1.0-E)*(1.0-K)
+def exact_utility_for_pair(pat_df_row, kdpi_norm, use_ml=False, post_tx_model=None):
+    """
+    Calculate utility for a patient-donor pair.
+    
+    Args:
+        pat_df_row: Patient row (Series or dict)
+        kdpi_norm: Normalized KDPI (0-1)
+        use_ml: If True, use ML model for Post-Tx prediction (requires post_tx_model)
+        post_tx_model: Trained PostTxSurvivalPredictor (required if use_ml=True)
+    
+    Returns:
+        Tuple of (utility, post_tx_survival, no_tx_survival)
+    """
     no_tx = float(pat_df_row['NoTx'])
+    
+    # Post-Tx survival: use ML model or fixed formula
+    if use_ml and post_tx_model is not None:
+        if not ML_AVAILABLE:
+            raise ImportError("ML models not available. Install scikit-learn and ensure ml_models.py exists.")
+        # Convert row to DataFrame for ML model
+        if isinstance(pat_df_row, pd.Series):
+            pat_df = pat_df_row.to_frame().T
+        else:
+            pat_df = pd.DataFrame([pat_df_row])
+        post = float(post_tx_model.predict_survival(pat_df, kdpi_norm=kdpi_norm)[0])
+    else:
+        # Fixed formula (original)
+        E = float(pat_df_row['EPTS_norm'])
+        K = float(kdpi_norm)
+        Age80 = float(pat_df_row['Age80'])
+        theta0,theta1,theta2,theta3,theta4 = 5.0, 6.0, 3.0, 1.0, 2.0
+        post = theta0 + theta1*(1.0-E) + theta2*(1.0-K) + theta3*(1.0-Age80) + theta4*(1.0-E)*(1.0-K)
+    
     util = max(post - no_tx, 0.0)
     return util, post, no_tx
 
-def allocate(don_df: pd.DataFrame, pat_df: pd.DataFrame, policy: str, alpha: float = 0.5, fairness_eta: float = 0.0, n_bins: int = 10, group_col: str = 'Ethnicity'):
+def allocate(don_df: pd.DataFrame, pat_df: pd.DataFrame, policy: str, alpha: float = 0.5, fairness_eta: float = 0.0, n_bins: int = 10, group_col: str = 'Ethnicity', use_ml=False, post_tx_model=None, no_tx_model=None):
     sorted_lists = build_sorted_lists(pat_df, policy, alpha, n_bins)
     available = np.ones(len(pat_df), dtype=bool)
     heads = {abo: {b: 0 for b in range(n_bins)} for abo in ['O','A','B','AB']}
@@ -108,7 +166,7 @@ def allocate(don_df: pd.DataFrame, pat_df: pd.DataFrame, policy: str, alpha: flo
             if policy == 'urgency':
                 score = U[i]
             else:
-                util, post, no_tx = exact_utility_for_pair(pat_df.iloc[i], K_norm)
+                util, post, no_tx = exact_utility_for_pair(pat_df.iloc[i], K_norm, use_ml=use_ml, post_tx_model=post_tx_model)
                 if policy == 'utility':
                     score = util
                 elif policy == 'hybrid':
@@ -122,7 +180,7 @@ def allocate(don_df: pd.DataFrame, pat_df: pd.DataFrame, policy: str, alpha: flo
             continue
         available[best_i] = False
         heads[best_abo][b] += 1
-        util, post, no_tx = exact_utility_for_pair(pat_df.iloc[best_i], K_norm)
+        util, post, no_tx = exact_utility_for_pair(pat_df.iloc[best_i], K_norm, use_ml=use_ml, post_tx_model=post_tx_model)
         records.append({
             'donor_index': d_idx, 'donor_bt': donor_bt, 'donor_kdpi': kdpi,
             'recipient_index': int(best_i), 'recipient_bt': pat_df.iloc[best_i]['BloodType'],
@@ -145,14 +203,15 @@ def allocate(don_df: pd.DataFrame, pat_df: pd.DataFrame, policy: str, alpha: flo
 
 def allocate_multidim(don_df: pd.DataFrame, pat_df: pd.DataFrame, policy: str, 
                       alpha: float = 0.5, fairness_eta: float = 0.0, n_bins: int = 10, 
-                      fairness_dims: list = ['Ethnicity'], fairness_weights: list = [1.0]):
+                      fairness_dims: list = ['Ethnicity'], fairness_weights: list = [1.0],
+                      use_ml=False, post_tx_model=None, no_tx_model=None):
     """
     Multi-dimensional fairness: tracks deficits across multiple dimensions independently
     and combines them with configurable weights.
     
     Args:
-        fairness_dims: List of column names to track for fairness (e.g., ['Ethnicity', 'SES'])
-        fairness_weights: Weights for each dimension (e.g., [0.7, 0.3] for 70% ethnicity, 30% SES)
+        fairness_dims: List of column names to track for fairness (e.g., ['Ethnicity', 'DistancetoCenterMiles'])
+        fairness_weights: Weights for each dimension (e.g., [0.7, 0.3] for 70% ethnicity, 30% distance)
     """
     sorted_lists = build_sorted_lists(pat_df, policy, alpha, n_bins)
     available = np.ones(len(pat_df), dtype=bool)
@@ -205,7 +264,7 @@ def allocate_multidim(don_df: pd.DataFrame, pat_df: pd.DataFrame, policy: str,
                 if policy == 'urgency':
                     base_score = U[i]
                 else:
-                    util, post, no_tx = exact_utility_for_pair(pat_df.iloc[i], K_norm)
+                    util, post, no_tx = exact_utility_for_pair(pat_df.iloc[i], K_norm, use_ml=False, post_tx_model=None)
                     if policy == 'utility':
                         base_score = util
                     elif policy == 'hybrid':
@@ -247,7 +306,7 @@ def allocate_multidim(don_df: pd.DataFrame, pat_df: pd.DataFrame, policy: str,
         for dim in fairness_dims:
             dim_data[dim]['alloc_counts'][dim_data[dim]['groups'][best_i]] += 1
         
-        util, post, no_tx = exact_utility_for_pair(pat_df.iloc[best_i], K_norm)
+        util, post, no_tx = exact_utility_for_pair(pat_df.iloc[best_i], K_norm, use_ml=use_ml, post_tx_model=post_tx_model)
         
         # Create group label for reporting
         group_label = '_'.join([dim_data[dim]['groups'][best_i] for dim in fairness_dims])
@@ -335,7 +394,7 @@ def sweep(patients_csv: str, donors_csv: str, alphas, etas, sample_patients: int
 
 def sweep_multidim(patients_csv: str, donors_csv: str, alphas, etas, 
                    sample_patients: int = 20000, sample_donors: int = 3000, seed: int = 42,
-                   fairness_dims: list = ['Ethnicity', 'SES'], 
+                   fairness_dims: list = ['Ethnicity', 'DistancetoCenterMiles'], 
                    fairness_weights: list = [0.5, 0.5]):
     """
     Parameter sweep using multi-dimensional fairness.

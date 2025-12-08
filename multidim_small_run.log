@@ -1,0 +1,18 @@
+Running multi-dimensional fairness sweep...
+Dimensions: ['Ethnicity', 'DistancetoCenterMiles', 'Sex']
+Weights: [0.333, 0.333, 0.334]
+Alphas: [0.25, 0.5, 0.75]
+Etas: [0.0, 1.0]
+
+Results:
+   total_benefit_years  mean_urgency_norm  fairness_L1  n_assigned                        fairness_dims       policy  alpha  fairness_eta
+0          8038.442883           0.766715     0.017867        1000  Ethnicity,DistancetoCenterMiles,Sex      Urgency   1.00           0.0
+1         10391.276128           0.558979     0.014200        1000  Ethnicity,DistancetoCenterMiles,Sex      Utility   0.00           0.0
+2         10273.198652           0.637666     0.019333        1000  Ethnicity,DistancetoCenterMiles,Sex       Hybrid   0.25           0.0
+3         10151.001276           0.636008     0.000867        1000  Ethnicity,DistancetoCenterMiles,Sex  Hybrid+Fair   0.25           1.0
+4          9744.289411           0.711574     0.016667        1000  Ethnicity,DistancetoCenterMiles,Sex       Hybrid   0.50           0.0
+5          9483.911675           0.713742     0.000933        1000  Ethnicity,DistancetoCenterMiles,Sex  Hybrid+Fair   0.50           1.0
+6          8856.402287           0.757239     0.010867        1000  Ethnicity,DistancetoCenterMiles,Sex       Hybrid   0.75           0.0
+7          8703.504582           0.749360     0.001067        1000  Ethnicity,DistancetoCenterMiles,Sex  Hybrid+Fair   0.75           1.0
+
+Saved to: data/summary_multidim_3d_small.csv

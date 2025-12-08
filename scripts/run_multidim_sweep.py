@@ -24,8 +24,8 @@ def main():
                     help='Alpha values (urgency/utility weight)')
     ap.add_argument('--etas', type=float, nargs='+', default=[0.0, 1.0], 
                     help='Eta values (fairness constraint strength)')
-    ap.add_argument('--fairness_dims', type=str, nargs='+', default=['Ethnicity', 'SES'],
-                    help='Dimensions to track for fairness (column names)')
+    ap.add_argument('--fairness_dims', type=str, nargs='+', default=['Ethnicity', 'DistancetoCenterMiles'],
+                    help='Dimensions to track for fairness (column names from SRTR data)')
     ap.add_argument('--fairness_weights', type=float, nargs='+', default=None,
                     help='Weights for each dimension (default: equal weights)')
     ap.add_argument('--seed', type=int, default=42, help='Random seed')
